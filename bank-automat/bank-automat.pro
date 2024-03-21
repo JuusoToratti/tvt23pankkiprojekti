@@ -1,5 +1,5 @@
 QT       += core gui
-
+QT += serialport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -22,3 +22,15 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../cardreader/build/release/ -lcardreader
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../cardreader/build/debug/ -lcardreader
+
+INCLUDEPATH += $$PWD/../cardreader
+DEPENDPATH += $$PWD/../cardreader
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../database/build/release/ -ldatabase
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../database/build/debug/ -ldatabase
+
+INCLUDEPATH += $$PWD/../database
+DEPENDPATH += $$PWD/../database
