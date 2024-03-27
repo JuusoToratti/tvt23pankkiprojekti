@@ -107,7 +107,10 @@ compiler_moc_header_make_all: release/moc_database.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) release/moc_database.cpp
 release/moc_database.cpp: ../database.h \
-		../database_global.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/QObject \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qnamespace.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qglobal.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtversionchecks.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtconfiginclude.h \
@@ -151,10 +154,6 @@ release/moc_database.cpp: ../database.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtresource.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qttranslation.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qversiontagging.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/QObject \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qnamespace.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtmetamacros.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs_impl.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qfunctionaltools_impl.h \
@@ -204,7 +203,6 @@ release/moc_database.cpp: ../database.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qscopeguard.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject_impl.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qbindingstorage.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/QString \
 		release/moc_predefs.h \
 		C:/Qt/6.6.2/mingw_64/bin/moc.exe
 	'C:\Qt\6.6.2\mingw_64\bin\moc.exe' $(DEFINES) --include 'C:/Users/User/OneDrive - Oulun ammattikorkeakoulu/projekti2/Koodit/SPO_Group14/database/build/release/moc_predefs.h' -IC:/Qt/6.6.2/mingw_64/mkspecs/win32-g++ -I'C:/Users/User/OneDrive - Oulun ammattikorkeakoulu/projekti2/Koodit/SPO_Group14/database' -IC:/Qt/6.6.2/mingw_64/include -IC:/Qt/6.6.2/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++ -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed -IC:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include ../database.h -o release/moc_database.cpp
@@ -226,7 +224,10 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 ####### Compile
 
 release/database.o: ../database.cpp ../database.h \
-		../database_global.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/QObject \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qnamespace.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qglobal.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtversionchecks.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtconfiginclude.h \
@@ -270,10 +271,6 @@ release/database.o: ../database.cpp ../database.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtresource.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qttranslation.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qversiontagging.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/QObject \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qnamespace.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtmetamacros.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qobjectdefs_impl.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qfunctionaltools_impl.h \
@@ -322,8 +319,7 @@ release/database.o: ../database.cpp ../database.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qtaggedpointer.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qscopeguard.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qobject_impl.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/qbindingstorage.h \
-		C:/Qt/6.6.2/mingw_64/include/QtCore/QString
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qbindingstorage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/database.o ../database.cpp
 
 release/moc_database.o: release/moc_database.cpp 

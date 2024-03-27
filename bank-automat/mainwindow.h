@@ -19,5 +19,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    const short RFIDsimulation = 8080;
 };
+
 #endif // MAINWINDOW_H
