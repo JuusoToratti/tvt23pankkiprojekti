@@ -1,6 +1,8 @@
 #include "mainuserinterface.h"
 #include "ui_mainuserinterface.h"
 #include "moneyselect.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 mainUserInterface::mainUserInterface(QWidget *parent)
     : QWidget(parent)
@@ -21,17 +23,20 @@ void mainUserInterface::withdrawMoneyClicked()
 {
     qDebug() << "withrdawMoneyClicked funktiossa";
 
-    // Suljetaan mainUserInterface-ikkuna
-    this->close();
-
     // Luodaan ja näytetään moneySelect-olio
     moneySelect *moneySelectWindow = new moneySelect();
     moneySelectWindow->show();
+
+    // Suljetaan mainUserInterface-ikkuna
+    this->close();
 }
 
 void mainUserInterface::logoutClicked()
 {
     qDebug() << "logoutclickedissä";
+    close();
 
-    emit backToMainwindow();
+    // Avataan pääikkuna (mainwindow.ui)
+    MainWindow *mainWindow = new MainWindow();
+    mainWindow->show();
 }

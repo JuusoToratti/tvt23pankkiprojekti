@@ -19,6 +19,9 @@ public:
 
 private:
     Ui::moneySelect *ui;
+
+private slots:
+    void handleBackToMenu();
 };
 
 #endif // MONEYSELECT_H

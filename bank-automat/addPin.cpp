@@ -1,11 +1,12 @@
 #include "addPin.h"
 #include "ui_addPin.h"
+#include "mainuserinterface.h"
 #include "ui_mainUserInterface.h"
 #include <QMessageBox>
 #include <QDebug>
 
 addPin::addPin(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
     , ui(new Ui::addPin)
 {
     ui->setupUi(this);
@@ -59,18 +60,13 @@ void addPin::handlePinInsert()
     if (num == correctPin) {
 
         qDebug() << "Oikea pin";
-        //suljetaan nykyinen ikkuna
-        this->close();
 
         // Luo uusi ikkuna ja käyttöliittymäolio
-        QMainWindow *mainWindow = new QMainWindow();
-        Ui::mainUserInterface *mainUi = new Ui::mainUserInterface();
+        mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+        mainUserInterfaceWindow->show();
 
-        // Aseta käyttöliittymä uuteen ikkunaan
-        mainUi->setupUi(mainWindow);
-
-        // Näytä uusi ikkuna
-        mainWindow->show();
+        //suljetaan nykyinen ikkuna
+        this->close();
 
     } else {
         qDebug() << "Virheellinen PIN-koodi";

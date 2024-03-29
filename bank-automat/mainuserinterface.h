@@ -21,9 +21,6 @@ public:
 private:
     Ui::mainUserInterface *ui;
 
-signals:
-    void backToMainwindow();   // Signaali palata pääikkunaan
-
 private slots:
    void logoutClicked();
     void withdrawMoneyClicked();

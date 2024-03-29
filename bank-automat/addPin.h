@@ -10,7 +10,7 @@ class addPin;
 }
 QT_END_NAMESPACE
 
-class addPin : public QMainWindow {
+class addPin : public QWidget{
     Q_OBJECT
 
 public:

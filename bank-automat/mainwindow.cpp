@@ -23,26 +23,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Luodaan mainUserInterface-olio ja yhdistetään signaali ja slot
-    userInterface = new mainUserInterface();
-    connect(userInterface, &mainUserInterface::backToMainwindow, this, &MainWindow::onMainUserInterfaceClosed);
-
-
     //tähän rfid-kortti
     if (RFIDsimulation == 8080)
     {
+        this->close();
         // Luo uusi ikkuna ja käyttöliittymäolio
         addPin *addPinWindow = new addPin();
         addPinWindow->show();
 
-        this->close();
+    } else {
+        ui->begin->setText("Korttia ei tunnistettu");
     }
-}
-
-void MainWindow::onMainUserInterfaceClosed()
-{
-    qDebug() << "onMainUserInterfaceClosedissa";
-    this->show(); // Näytetään pääikkuna, kun mainUserInterface suljetaan
 }
 
 MainWindow::~MainWindow()

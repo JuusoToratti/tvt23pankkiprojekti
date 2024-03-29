@@ -17,14 +17,17 @@
    <widget class="QLabel" name="begin">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>40</y>
+      <x>70</x>
+      <y>30</y>
       <width>158</width>
       <height>78</height>
      </rect>
     </property>
     <property name="text">
      <string>Syötä kortti lukijaan</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
