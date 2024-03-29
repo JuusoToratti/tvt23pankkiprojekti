@@ -11,19 +11,21 @@ CONFIG += c++17
 SOURCES += \
     addPin.cpp \
     main.cpp \
-    mainUserInterface.cpp \
-    mainwindow.cpp
+    mainuserinterface.cpp \
+    mainwindow.cpp \
+    moneyselect.cpp
 
 HEADERS += \
     addPin.h \
-    mainUserInterface.h \
-    mainwindow.h
+    mainuserinterface.h \
+    mainwindow.h \
+    moneyselect.h
 
 FORMS += \
     addPin.ui \
-    mainUserInterface.ui \
+    mainuserinterface.ui \
     mainwindow.ui \
-    moneySelect.ui
+    moneyselect.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

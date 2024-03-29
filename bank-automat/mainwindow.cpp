@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QDialog>
+#include <QDebug>
 
 #include <QMainWindow>
 
@@ -22,23 +23,26 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // Luodaan mainUserInterface-olio ja yhdistetään signaali ja slot
+    userInterface = new mainUserInterface();
+    connect(userInterface, &mainUserInterface::backToMainwindow, this, &MainWindow::onMainUserInterfaceClosed);
+
+
     //tähän rfid-kortti
     if (RFIDsimulation == 8080)
     {
         // Luo uusi ikkuna ja käyttöliittymäolio
-        QMainWindow *addPinWindow = new QMainWindow();
-        Ui::addPin *addPinUi = new Ui::addPin();
-
-        // Aseta käyttöliittymä addPin-ikkunaan
-        addPinUi->setupUi(addPinWindow);
-
-        // Näytä ikkuna
+        addPin *addPinWindow = new addPin();
         addPinWindow->show();
 
         this->close();
-
-        delete addPinUi;
     }
+}
+
+void MainWindow::onMainUserInterfaceClosed()
+{
+    qDebug() << "onMainUserInterfaceClosedissa";
+    this->show(); // Näytetään pääikkuna, kun mainUserInterface suljetaan
 }
 
 MainWindow::~MainWindow()

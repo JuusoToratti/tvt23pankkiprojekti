@@ -11,7 +11,21 @@ addPin::addPin(QWidget *parent)
     ui->setupUi(this);
 
     //Liitä QPushButton::clicked-signaali handlePinInsert-slotiin
-    connect(ui->pinSubmit, &QPushButton::clicked, this, &addPin::handlePinInsert);
+    connect(ui->pinSubmit,SIGNAL(clicked(bool)),
+        this,SLOT(handlePinInsert()));
+
+    // Connect signals and slots
+    connect(ui->n0, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n1, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n2, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n3, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n4, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n5, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n6, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n7, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n8, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->n9, &QPushButton::clicked, this, &addPin::numberClickedHandler);
+    connect(ui->clear, &QPushButton::clicked, this, &addPin::clearLineEdit);
 }
 
 addPin::~addPin()
@@ -19,20 +33,45 @@ addPin::~addPin()
     delete ui;
 }
 
+void addPin::clearLineEdit()
+{
+    ui->pinLine->clear();
+}
+
+void addPin::numberClickedHandler()
+{
+    QPushButton *button = qobject_cast<QPushButton*>(sender());
+    if (button) {
+        QString number = button->text();
+        ui->pinLine->setText(ui->pinLine->text() + number);
+    }
+}
+
 void addPin::handlePinInsert()
 {
+
+    qDebug() << "handlePinInsert funktiossa";
+
     // Luetaan syötetty arvo
     QString enteredPin = ui->pinLine->text();
+    short num = enteredPin.toShort();
 
-    if (enteredPin == correctPin) {
-        // Luo uusi käyttöliittymäolio
-        Ui::MainUserInterface *secondUi = new Ui::MainUserInterface();
+    if (num == correctPin) {
 
-        // Aseta käyttöliittymä tähän ikkunaan
-        secondUi->setupUi(this);
-
-        // Piilota PIN-koodin lisäysikkuna
+        qDebug() << "Oikea pin";
+        //suljetaan nykyinen ikkuna
         this->close();
+
+        // Luo uusi ikkuna ja käyttöliittymäolio
+        QMainWindow *mainWindow = new QMainWindow();
+        Ui::mainUserInterface *mainUi = new Ui::mainUserInterface();
+
+        // Aseta käyttöliittymä uuteen ikkunaan
+        mainUi->setupUi(mainWindow);
+
+        // Näytä uusi ikkuna
+        mainWindow->show();
+
     } else {
         qDebug() << "Virheellinen PIN-koodi";
     }

@@ -24,6 +24,8 @@ private:
 
 private slots:
     void handlePinInsert();
+    void numberClickedHandler();
+    void clearLineEdit();
 };
 
 #endif // ADDPIN_H
