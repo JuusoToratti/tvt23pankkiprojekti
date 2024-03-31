@@ -13,33 +13,24 @@ SOURCES += \
     main.cpp \
     mainuserinterface.cpp \
     mainwindow.cpp \
-    moneyselect.cpp
+    moneyselect.cpp \
+    selectamount.cpp
 
 HEADERS += \
     addPin.h \
     mainuserinterface.h \
     mainwindow.h \
-    moneyselect.h
+    moneyselect.h \
+    selectamount.h
 
 FORMS += \
     addPin.ui \
     mainuserinterface.ui \
     mainwindow.ui \
-    moneyselect.ui
+    moneyselect.ui \
+    selectamount.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../cardreader/build/release/ -lcardreader
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../cardreader/build/debug/ -lcardreader
-
-INCLUDEPATH += $$PWD/../cardreader
-DEPENDPATH += $$PWD/../cardreader
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../database/build/release/ -ldatabase
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../database/build/debug/ -ldatabase
-
-INCLUDEPATH += $$PWD/../database
-DEPENDPATH += $$PWD/../database

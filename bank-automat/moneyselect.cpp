@@ -2,6 +2,8 @@
 #include "ui_moneyselect.h"
 #include "mainuserinterface.h"
 #include "ui_mainuserinterface.h"
+#include "selectamount.h"
+#include "ui_selectamount.h"
 
 moneySelect::moneySelect(QWidget *parent)
     : QWidget(parent)
@@ -10,6 +12,7 @@ moneySelect::moneySelect(QWidget *parent)
     ui->setupUi(this);
 
     connect(ui->backToMenu, &QPushButton::clicked, this, &moneySelect::handleBackToMenu);
+    connect(ui->selectAmount, &QPushButton::clicked, this, &moneySelect::handleOtherAmount);
 }
 
 moneySelect::~moneySelect()
@@ -23,6 +26,16 @@ void moneySelect::handleBackToMenu()
     // Luo uusi ikkuna ja käyttöliittymäolio
     mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
     mainUserInterfaceWindow->show();
+
+    //suljetaan nykyinen ikkuna
+    this->close();
+}
+
+void moneySelect::handleOtherAmount()
+{
+    // Luo uusi ikkuna ja käyttöliittymäolio
+    selectAmount *selectAmountWindow = new selectAmount();
+    selectAmountWindow->show();
 
     //suljetaan nykyinen ikkuna
     this->close();

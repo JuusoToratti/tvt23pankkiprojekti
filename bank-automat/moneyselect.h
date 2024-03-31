@@ -22,6 +22,7 @@ private:
 
 private slots:
     void handleBackToMenu();
+    void handleOtherAmount();
 };
 
 #endif // MONEYSELECT_H
