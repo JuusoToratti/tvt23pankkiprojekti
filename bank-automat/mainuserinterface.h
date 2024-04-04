@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMainWindow>
+#include <mainwindow.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,7 +24,7 @@ private:
 
 private slots:
    void logoutClicked();
-    void withdrawMoneyClicked();
+   void withdrawMoneyClicked();
 };
 
 #endif // MAINUSERINTERFACE_H

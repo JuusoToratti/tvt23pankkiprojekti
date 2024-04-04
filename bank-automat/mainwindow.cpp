@@ -16,6 +16,8 @@
 
 #include <QMainWindow>
 
+#include "rfidreaderdll.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,20 +25,35 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    //tähän rfid-kortti
-    if (RFIDsimulation == 8080)
-    {
-        this->close();
-        // Luo uusi ikkuna ja käyttöliittymäolio
-        addPin *addPinWindow = new addPin();
-        addPinWindow->show();
+    // Luo RFID-lukijan olio
+    RFIDReaderdll *rfidReader = new RFIDReaderdll(this);
 
-    } else {
-        ui->begin->setText("Korttia ei tunnistettu");
-    }
+    // Yhdistä signaali ja slot
+    connect(rfidReader, &RFIDReaderdll::cardDetected, this, &MainWindow::handleCardDetected);
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::handleCardDetected(QString cardID)
+{
+    // Tunnista kortin ID ja avaa oikea ikkuna sen perusteella
+    qDebug() << "Lätkästä luetut tiedot:" << cardID;
+
+    if (cardID == "-0600062093\r\n>") {
+
+        //suljetaan nykyinen ikkuna
+        addPin *addPinWindow = new addPin();
+        this->close();
+        addPinWindow->show();
+
+    } else if (cardID == "-06000621FE\r\n>") {
+        // Avaa ikkuna 2
+        ui->begin->setText("CD-kortti");
+    } else {
+        ui->begin->setText("Korttia ei tunnistettu");
+    }
+  }

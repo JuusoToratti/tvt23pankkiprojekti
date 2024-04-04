@@ -3,10 +3,12 @@
 #include "moneyselect.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QProcess>
 
 mainUserInterface::mainUserInterface(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::mainUserInterface)
+
 {
     ui->setupUi(this);
 
@@ -34,9 +36,17 @@ void mainUserInterface::withdrawMoneyClicked()
 void mainUserInterface::logoutClicked()
 {
     qDebug() << "logoutclickedissä";
-    close();
 
-    // Avataan pääikkuna (mainwindow.ui)
-    MainWindow *mainWindow = new MainWindow();
-    mainWindow->show();
+
+    // Sulje sovellus kokonaan
+    qApp->quit();
+
+    // Käynnistä sovellus uudelleen
+    QProcess::startDetached(QApplication::applicationFilePath());
+
+    //this->close();
+
+    //Avataan pääikkuna (mainwindow.ui)
+    //MainWindow *mainWindow = new MainWindow();
+    //mainWindow->show();
 }

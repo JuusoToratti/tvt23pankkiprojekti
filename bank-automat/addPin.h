@@ -21,11 +21,17 @@ private:
     Ui::addPin *ui;
     const short correctPin = 5757;
     QString  enteredPin;
+    QTimer *timer;
 
 private slots:
     void handlePinInsert();
     void numberClickedHandler();
     void clearLineEdit();
+    void timerTimeout();
+
+
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // ADDPIN_H

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include "mainuserinterface.h"
+#include "addPin.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,7 +22,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    const short RFIDsimulation = 8080;
+    void handleCardDetected(QString cardID);
+    addPin *currentAddPinWindow = nullptr;
 };
 
 #endif // MAINWINDOW_H

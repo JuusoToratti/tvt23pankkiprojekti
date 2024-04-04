@@ -4,6 +4,9 @@
 #include "ui_mainUserInterface.h"
 #include <QMessageBox>
 #include <QDebug>
+#include <QTimer>
+#include <QProcess>
+#include <QCloseEvent>
 
 addPin::addPin(QWidget *parent)
     : QWidget(parent)
@@ -27,6 +30,11 @@ addPin::addPin(QWidget *parent)
     connect(ui->n8, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->n9, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->clear, &QPushButton::clicked, this, &addPin::clearLineEdit);
+
+    // Create a timer to close the addPin window and open the MainWindow after 60 seconds
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &addPin::timerTimeout);
+    timer->start(60000);
 }
 
 addPin::~addPin()
@@ -37,6 +45,31 @@ addPin::~addPin()
 void addPin::clearLineEdit()
 {
     ui->pinLine->clear();
+}
+
+void addPin::timerTimeout()
+{
+    qDebug() << "Aika loppui";
+
+    // Close the addPin window
+    // this->close();
+
+    // Create a new MainWindow and show it
+    // MainWindow *mainWindow = new MainWindow();
+    // mainWindow->show();
+
+    // Sulje sovellus kokonaan
+    qApp->quit();
+
+    // Käynnistä sovellus uudelleen
+    QProcess::startDetached(QApplication::applicationFilePath());
+}
+
+void addPin::closeEvent(QCloseEvent *event)
+{
+    // Stop the timer when addPin window is closed
+    timer->stop();
+    event->accept();
 }
 
 void addPin::numberClickedHandler()
@@ -69,6 +102,6 @@ void addPin::handlePinInsert()
         this->close();
 
     } else {
-        qDebug() << "Virheellinen PIN-koodi";
+        ui->insertPinLabel->setText("Väärä PIN-koodi");
     }
 }
