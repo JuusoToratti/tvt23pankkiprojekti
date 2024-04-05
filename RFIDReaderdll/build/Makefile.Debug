@@ -209,6 +209,9 @@ debug/moc_rfidreaderdll.cpp: ../../bank-automat/RFIDReaderdll/rfidreaderdll.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qiodevice.h \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/qserialportglobal.h \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/qtserialportexports.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/QTimer \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qtimer.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qbasictimer.h \
 		debug/moc_predefs.h \
 		C:/Qt/6.6.2/mingw_64/bin/moc.exe
 	'C:\Qt\6.6.2\mingw_64\bin\moc.exe' $(DEFINES) --include 'C:/Users/tniem/OneDrive - Oulun ammattikorkeakoulu/projekti2/Koodit/SPO_Group14/RFIDReaderdll/build/debug/moc_predefs.h' -IC:/Qt/6.6.2/mingw_64/mkspecs/win32-g++ -I'C:/Users/tniem/OneDrive - Oulun ammattikorkeakoulu/projekti2/Koodit/SPO_Group14/bank-automat/RFIDReaderdll' -IC:/Qt/6.6.2/mingw_64/include -IC:/Qt/6.6.2/mingw_64/include/QtSerialPort -IC:/Qt/6.6.2/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++ -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed -IC:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include ../../bank-automat/RFIDReaderdll/rfidreaderdll.h -o debug/moc_rfidreaderdll.cpp
@@ -332,6 +335,9 @@ debug/rfidreaderdll.o: ../../bank-automat/RFIDReaderdll/rfidreaderdll.cpp ../../
 		C:/Qt/6.6.2/mingw_64/include/QtCore/qiodevice.h \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/qserialportglobal.h \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/qtserialportexports.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/QTimer \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qtimer.h \
+		C:/Qt/6.6.2/mingw_64/include/QtCore/qbasictimer.h \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/QSerialPortInfo \
 		C:/Qt/6.6.2/mingw_64/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/6.6.2/mingw_64/include/QtCore/QDebug \

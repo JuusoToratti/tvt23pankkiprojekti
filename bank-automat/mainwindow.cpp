@@ -18,6 +18,8 @@
 
 #include "rfidreaderdll.h"
 
+#include "cdchoice.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -29,8 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     RFIDReaderdll *rfidReader = new RFIDReaderdll(this);
 
     // Yhdistä signaali ja slot
-    connect(rfidReader, &RFIDReaderdll::cardDetected, this, &MainWindow::handleCardDetected);
-
+    connect(rfidReader, &RFIDReaderdll::cardDetected, this, &MainWindow::handleCardDetected); 
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +54,9 @@ void MainWindow::handleCardDetected(QString cardID)
     } else if (cardID == "-06000621FE\r\n>") {
         // Avaa ikkuna 2
         ui->begin->setText("CD-kortti");
+        cdChoice * cdChoiceWindow = new cdChoice();
+        this->close();
+        cdChoiceWindow->show();
     } else {
         ui->begin->setText("Korttia ei tunnistettu");
     }

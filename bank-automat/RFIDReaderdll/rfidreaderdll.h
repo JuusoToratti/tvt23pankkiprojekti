@@ -5,6 +5,7 @@
 #include "RFIDReaderdll_global.h"
 #include <QObject>
 #include <QSerialPort>
+#include <QTimer>
 
 class RFIDREADERDLL_EXPORT RFIDReaderdll : public QObject
 {
@@ -21,7 +22,6 @@ private slots:
 
 private:
     QSerialPort m_serial;
-
 };
 
 #endif // RFIDREADERDLL_H

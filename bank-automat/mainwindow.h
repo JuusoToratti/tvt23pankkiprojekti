@@ -5,6 +5,8 @@
 #include <QLineEdit>
 #include "mainuserinterface.h"
 #include "addPin.h"
+#include "rfidreaderdll.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,8 +24,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    //void handleCardDetected(QString cardID);
+
+private slots:
     void handleCardDetected(QString cardID);
-    addPin *currentAddPinWindow = nullptr;
 };
 
 #endif // MAINWINDOW_H

@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     addPin.cpp \
+    cdchoice.cpp \
     main.cpp \
     mainuserinterface.cpp \
     mainwindow.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
 
 HEADERS += \
     addPin.h \
+    cdchoice.h \
     mainuserinterface.h \
     mainwindow.h \
     moneyselect.h \
@@ -25,6 +27,7 @@ HEADERS += \
 
 FORMS += \
     addPin.ui \
+    cdchoice.ui \
     mainuserinterface.ui \
     mainwindow.ui \
     moneyselect.ui \
