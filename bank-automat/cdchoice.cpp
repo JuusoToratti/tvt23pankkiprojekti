@@ -27,20 +27,23 @@ cdChoice::~cdChoice()
 
 void cdChoice::creditClicked()
 {
+    //suljetaan nykyinen ikkuna
     this->close();
 
     // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
-    mainUserInterfaceWindow->show();
+
+    addPin *addPinWindow = new addPin();
+    addPinWindow->show();
 }
 
 void cdChoice::debitClicked()
 {
+    //suljetaan nykyinen ikkuna
     this->close();
 
     // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
-    mainUserInterfaceWindow->show();
+    addPin *addPinWindow = new addPin();
+    addPinWindow->show();
 }
 
 void cdChoice::timerOut()

@@ -6,25 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
-    <height>95</height>
+    <width>192</width>
+    <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-image: url(C:/bank.background.jpg);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="begin">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>20</x>
       <y>10</y>
       <width>151</width>
       <height>41</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 100);</string>
+    </property>
     <property name="text">
-     <string>Syötä kortti lukijaan</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Syötä kortti lukijaan&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -36,7 +42,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>262</width>
+     <width>192</width>
      <height>17</height>
     </rect>
    </property>
