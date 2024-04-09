@@ -23,7 +23,12 @@ RFIDReaderdll::RFIDReaderdll(QObject *parent)
 
 void RFIDReaderdll::readRFID()
 {
+    //Ladataan tiedot sarjaportista ja tallennetaan data-olioon
+    //QByteArray on dynaamisesti muuttuva tavupuskuri, sen koko voi vaihtua
     QByteArray data = m_serial.readAll();
+    //"data" muunnetaan QString muotoon käyttäen Latin-1-merkistöä
+    //trimmed-metodi poistaa tarpeettomat välilyönnit ja rivinvaihdot
     QString cardID = QString::fromLatin1(data).trimmed();
+    //Lähetetään signaali
     emit cardDetected(cardID);
 }

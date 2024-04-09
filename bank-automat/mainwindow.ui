@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>192</width>
-    <height>92</height>
+    <width>213</width>
+    <height>123</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,20 +17,28 @@
    <string notr="true">background-image: url(C:/bank.background.jpg);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <widget class="QLabel" name="begin">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>151</width>
-      <height>41</height>
+      <width>171</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgba(255, 255, 255, 100);</string>
+     <string notr="true">
+background-color: transparent;
+background-image: none;
+color: white;
+
+</string>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Syötä kortti lukijaan&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Tervetuloa!&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Syötä kortti, ole hyvä&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -42,7 +50,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>192</width>
+     <width>213</width>
      <height>17</height>
     </rect>
    </property>

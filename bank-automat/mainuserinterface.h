@@ -25,6 +25,8 @@ private:
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
+   void handleBalanceClicked();
+   void handleWithClicked();
 };
 
 #endif // MAINUSERINTERFACE_H

@@ -3,6 +3,10 @@
 #include "moneyselect.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "accountbalance.h"
+#include "ui_accountbalance.h"
+#include "accwithdrawals.h"
+#include "ui_accwithdrawals.h"
 #include <QProcess>
 
 mainUserInterface::mainUserInterface(QWidget *parent)
@@ -14,6 +18,8 @@ mainUserInterface::mainUserInterface(QWidget *parent)
 
     connect(ui->logOut, &QPushButton::clicked, this, &mainUserInterface::logoutClicked);
     connect(ui->withdrawMoney, &QPushButton::clicked, this, &mainUserInterface::withdrawMoneyClicked);
+    connect(ui->showBalance, QPushButton::clicked, this, &mainUserInterface::handleBalanceClicked);
+    connect(ui->showTransactions, QPushButton::clicked, this, &mainUserInterface::handleWithClicked);
 }
 
 mainUserInterface::~mainUserInterface()
@@ -28,6 +34,24 @@ void mainUserInterface::withdrawMoneyClicked()
     // Luodaan ja näytetään moneySelect-olio
     moneySelect *moneySelectWindow = new moneySelect();
     moneySelectWindow->show();
+
+    // Suljetaan mainUserInterface-ikkuna
+    this->close();
+}
+
+void mainUserInterface::handleBalanceClicked()
+{
+    accountBalance *accountBalanceWindow = new accountBalance();
+    accountBalanceWindow->show();
+
+    // Suljetaan mainUserInterface-ikkuna
+    this->close();
+}
+
+void mainUserInterface::handleWithClicked()
+{
+    accWithdrawals *accWithdrawalsWindow = new accWithdrawals();
+    accWithdrawalsWindow->show();
 
     // Suljetaan mainUserInterface-ikkuna
     this->close();
