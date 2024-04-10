@@ -2,6 +2,9 @@
 #define ACCWITHDRAWALS_H
 
 #include <QWidget>
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
 
 namespace Ui {
 class accWithdrawals;

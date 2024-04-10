@@ -3,6 +3,10 @@
 
 #include <QWidget>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class moneySelect;

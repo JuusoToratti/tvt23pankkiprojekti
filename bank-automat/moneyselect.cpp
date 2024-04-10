@@ -11,6 +11,10 @@ moneySelect::moneySelect(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     connect(ui->backToMenu, &QPushButton::clicked, this, &moneySelect::handleBackToMenu);
     connect(ui->selectAmount, &QPushButton::clicked, this, &moneySelect::handleOtherAmount);
 }

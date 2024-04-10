@@ -11,6 +11,10 @@ accountBalance::accountBalance(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     connect(ui->logoutButton2, &QPushButton::clicked, this, &accountBalance::handleLogoutClicked);
     connect(ui->backButton, &QPushButton::clicked, this, &accountBalance::handleBackClicked);
 }

@@ -9,6 +9,10 @@ selectAmount::selectAmount(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     // Connect signals and slots
     connect(ui->N0, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
     connect(ui->N1, &QPushButton::clicked, this, &selectAmount::numClickedHandler);

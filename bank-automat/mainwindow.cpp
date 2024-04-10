@@ -27,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     // Luo RFID-lukijan olio
     RFIDReaderdll *rfidReader = new RFIDReaderdll(this);
 

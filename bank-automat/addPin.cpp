@@ -14,11 +14,15 @@ addPin::addPin(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     //Liitä QPushButton::clicked-signaali handlePinInsert-slotiin
     connect(ui->pinSubmit,SIGNAL(clicked(bool)),
         this,SLOT(handlePinInsert()));
 
-    // Connect signals and slots
+    // Yhdistä signaalit ja slotit
     connect(ui->n0, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->n1, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->n2, &QPushButton::clicked, this, &addPin::numberClickedHandler);
@@ -31,7 +35,7 @@ addPin::addPin(QWidget *parent)
     connect(ui->n9, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->clear, &QPushButton::clicked, this, &addPin::clearLineEdit);
 
-    // Create a timer to close the addPin window and open the MainWindow after 60 seconds
+    // Luodaan timeri joka sulkee addPin.ui ja avaa MainWindow.ui 60 sekunnin jälkeen
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &addPin::timerTimeout);
     timer->start(60000);
@@ -67,7 +71,7 @@ void addPin::timerTimeout()
 
 void addPin::closeEvent(QCloseEvent *event)
 {
-    // Stop the timer when addPin window is closed
+    // Pysäytetään timer kun addPin.ui sulkeutuu
     timer->stop();
     event->accept();
 }

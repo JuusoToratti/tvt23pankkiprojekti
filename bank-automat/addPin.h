@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QLineEdit>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class addPin;

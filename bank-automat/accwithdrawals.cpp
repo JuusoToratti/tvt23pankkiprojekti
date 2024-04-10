@@ -10,6 +10,10 @@ accWithdrawals::accWithdrawals(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     connect(ui->withBackButton, &QPushButton::clicked, this, &accWithdrawals::handleBack);
 }
 

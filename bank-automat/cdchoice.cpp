@@ -11,6 +11,10 @@ cdChoice::cdChoice(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     connect(ui->creditButton, &QPushButton::clicked, this, &cdChoice::creditClicked);
     connect(ui->debitButton, &QPushButton::clicked, this, &cdChoice::debitClicked);
 

@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-image: url(C:/bank.background.jpg);</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -31,9 +31,7 @@
     </property>
     <property name="styleSheet">
      <string notr="true">
-background-color: transparent;
-background-image: none;
-color: white;
+
 
 </string>
     </property>

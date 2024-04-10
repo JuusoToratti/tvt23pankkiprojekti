@@ -54,7 +54,7 @@
     <item row="0" column="0" colspan="2">
      <widget class="QLabel" name="customerName">
       <property name="text">
-       <string>Tähän asiakkaan nimi</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

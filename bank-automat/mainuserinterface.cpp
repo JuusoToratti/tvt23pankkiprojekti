@@ -16,6 +16,10 @@ mainUserInterface::mainUserInterface(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
     connect(ui->logOut, &QPushButton::clicked, this, &mainUserInterface::logoutClicked);
     connect(ui->withdrawMoney, &QPushButton::clicked, this, &mainUserInterface::withdrawMoneyClicked);
     connect(ui->showBalance, QPushButton::clicked, this, &mainUserInterface::handleBalanceClicked);

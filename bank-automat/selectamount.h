@@ -3,6 +3,10 @@
 
 #include <QWidget>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 namespace Ui {
 class selectAmount;
 }
