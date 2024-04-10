@@ -5,6 +5,10 @@
 #include <QMainWindow>
 #include <mainwindow.h>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class mainUserInterface;

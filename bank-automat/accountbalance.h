@@ -23,7 +23,7 @@ private:
 
 private slots:
     void handleBackClicked();
-    void handleLogoutClicked();
+    void handleLogoutClicked();   
 };
 
 #endif // ACCOUNTBALANCE_H

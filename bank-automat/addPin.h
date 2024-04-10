@@ -27,11 +27,17 @@ private:
     QString  enteredPin;
     QTimer *timer;
 
+    QNetworkAccessManager *pgetManager;
+    QNetworkReply *preply;
+    QByteArray response_data;
+
 private slots:
     void handlePinInsert();
     void numberClickedHandler();
     void clearLineEdit();
     void timerTimeout();
+
+    void getNamesSlot (QNetworkReply *preply);
 
 
 protected:
