@@ -69,42 +69,6 @@ void addPin::timerTimeout()
     QProcess::startDetached(QApplication::applicationFilePath());
 }
 
-void addPin::getNamesSlot(QNetworkReply *preply)
-{
-    response_data=preply->readAll();
-    qDebug()<<"DATA : "+response_data;
-
-    QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
-    QJsonArray json_array = json_doc.array();
-
-    QString cName;
-    foreach (const QJsonValue &value, json_array) {
-        QJsonObject json_obj = value.toObject();
-        if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
-            QString fname = json_obj["fname"].toString();
-            QString lname = json_obj["lname"].toString();
-            cName = "Hei " + fname + " " + lname + "!";
-            break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
-        //cName+=QString::number(json_obj["iduser"].toInt())+", "+json_obj["fname"].toString()+", "+json_obj["lname"].toString()+"\r";
-    }
-   }
-
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
-
-    QLabel *customerName = mainUserInterfaceWindow->findChild<QLabel*>("customerName");
-    if (customerName) {
-        customerName->setText(cName);
-    }
-    mainUserInterfaceWindow->show();
-
-    //suljetaan nykyinen ikkuna
-    this->close();
-
-    preply->deleteLater();
-    pgetManager->deleteLater();
-}
-
 void addPin::closeEvent(QCloseEvent *event)
 {
     // Pysäytetään timer kun addPin.ui sulkeutuu
@@ -134,17 +98,56 @@ void addPin::handlePinInsert()
 
         qDebug() << "Oikea pin";
 
+        //jos rest-api puolella url muuttuu, niin tähän myös muutos
         QString site_url="http://localhost:3000/users/user";
         QNetworkRequest request((site_url));
+
         //WEBTOKEN ALKU
         //QByteArray myToken="Bearer "+webToken;
         //request.setRawHeader(QByteArray("Authorization"),(myToken));
         //WEBTOKEN LOPPU
+
         pgetManager = new QNetworkAccessManager(this);
-        connect(pgetManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
+        connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
         preply = pgetManager->get(request);
 
     } else {
         ui->insertPinLabel->setText("Väärä PIN-koodi");
     }
+}
+
+void addPin::getNamesSlot(QNetworkReply *preply)
+{
+    response_data=preply->readAll();
+    //qDebug()<<"DATA : "+response_data;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
+    QJsonArray json_array = json_doc.array();
+
+    QString cName;
+    foreach (const QJsonValue &value, json_array) {
+        QJsonObject json_obj = value.toObject();
+        if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
+            QString fname = json_obj["fname"].toString();
+            QString lname = json_obj["lname"].toString();
+            cName = "Hei " + fname + " " + lname + "!";
+            break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
+            //cName+=QString::number(json_obj["iduser"].toInt())+", "+json_obj["fname"].toString()+", "+json_obj["lname"].toString()+"\r";
+        }
+    }
+
+    // Luo uusi ikkuna ja käyttöliittymäolio
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+
+    QLabel *customerName = mainUserInterfaceWindow->findChild<QLabel*>("customerName");
+    if (customerName) {
+        customerName->setText(cName);
+    }
+    mainUserInterfaceWindow->show();
+
+    //suljetaan nykyinen ikkuna
+    this->close();
+
+    preply->deleteLater();
+    pgetManager->deleteLater();
 }

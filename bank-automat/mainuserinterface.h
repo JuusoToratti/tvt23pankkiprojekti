@@ -26,11 +26,17 @@ public:
 private:
     Ui::mainUserInterface *ui;
 
+    QNetworkAccessManager *pgetManager;
+    QNetworkReply *preply;
+    QByteArray response_data;
+
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
-   void handleBalanceClicked();
    void handleWithClicked();
+
+   void getCreditBalanceSlot ();
+   void onNetworkRequestFinished(QNetworkReply *preply);
 };
 
 #endif // MAINUSERINTERFACE_H
