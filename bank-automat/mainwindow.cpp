@@ -46,16 +46,19 @@ MainWindow::~MainWindow()
 void MainWindow::handleCardDetected(QString cardID)
 {
     // Tunnista kortin ID ja avaa oikea ikkuna sen perusteella
-    qDebug() << "Lätkästä luetut tiedot:" << cardID;
+    qDebug() << "Kortista luetut tiedot:" << cardID;
 
     if (cardID == "-0600062093\r\n>") {
 
+        cardNumber = cardID;
         //suljetaan nykyinen ikkuna
         addPin *addPinWindow = new addPin();
         this->close();
         addPinWindow->show();
 
     } else if (cardID == "-06000621FE\r\n>") {
+
+        cardNumber = cardID;
         // Avaa ikkuna 2
         ui->begin->setText("CD-kortti");
         cdChoice * cdChoiceWindow = new cdChoice();

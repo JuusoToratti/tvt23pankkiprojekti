@@ -18,18 +18,23 @@ class addPin : public QWidget{
     Q_OBJECT
 
 public:
-    addPin(QWidget *parent = nullptr);
+    explicit addPin(QWidget *parent = nullptr);
     ~addPin();
 
 private:
     Ui::addPin *ui;
-    const short correctPin = 5757;
     QString  enteredPin;
     QTimer *timer;
+    QString correctPin = "";
+    int cardtype = 0;
 
     QNetworkAccessManager *pgetManager;
     QNetworkReply *preply;
     QByteArray response_data;
+
+    QNetworkAccessManager *pgetManagerPin;
+    QNetworkReply *preplyPin;
+    QByteArray response_dataPin;
 
 private slots:
     void handlePinInsert();
@@ -38,7 +43,7 @@ private slots:
     void timerTimeout();
 
     void getNamesSlot (QNetworkReply *preply);
-
+    void getPinSlot (QNetworkReply *preplyPin);
 
 protected:
     void closeEvent(QCloseEvent *event);

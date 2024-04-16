@@ -25,8 +25,8 @@ accWithdrawals::~accWithdrawals()
 void accWithdrawals::handleBack()
 {
     // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow3 = new mainUserInterface();
-    mainUserInterfaceWindow3->show();
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+    mainUserInterfaceWindow->show();
 
     //suljetaan nykyinen ikkuna
     this->close();

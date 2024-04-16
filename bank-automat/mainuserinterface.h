@@ -33,7 +33,7 @@ private:
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
-   void handleWithClicked();
+   void handleTransactionsClicked();
 
    void getCreditBalanceSlot ();
    void onNetworkRequestFinished(QNetworkReply *preply);

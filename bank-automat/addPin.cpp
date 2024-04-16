@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QProcess>
 #include <QCloseEvent>
+#include <QtSql>
 
 addPin::addPin(QWidget *parent)
     : QWidget(parent)
@@ -38,7 +39,7 @@ addPin::addPin(QWidget *parent)
     // Luodaan timeri joka sulkee addPin.ui ja avaa MainWindow.ui 60 sekunnin jälkeen
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &addPin::timerTimeout);
-    timer->start(60000);
+    timer->start(60000);  
 }
 
 addPin::~addPin()
@@ -78,6 +79,7 @@ void addPin::closeEvent(QCloseEvent *event)
 
 void addPin::numberClickedHandler()
 {
+    //Castaa klikatut numerot pinLine-tekstikenttään
     QPushButton *button = qobject_cast<QPushButton*>(sender());
     if (button) {
         QString number = button->text();
@@ -87,14 +89,72 @@ void addPin::numberClickedHandler()
 
 void addPin::handlePinInsert()
 {
+    //jos rest-api puolella url muuttuu, niin tähän myös muutos
+    QString card_url="http://localhost:3000/cardroutes/getcardnumberpin";
+    QNetworkRequest requestPin((card_url));
+
+    //WEBTOKEN ALKU
+    //QByteArray myToken="Bearer "+webToken;
+    //request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN LOPPU
+
+    pgetManagerPin = new QNetworkAccessManager(this);
+    connect(pgetManagerPin, SIGNAL(finished(QNetworkReply*)), this, SLOT(getPinSlot(QNetworkReply*)));
+    preplyPin = pgetManagerPin->get(requestPin);
 
     qDebug() << "handlePinInsert funktiossa";
 
+    /*// Luetaan syötetty arvo
+    QString enteredPin = ui->pinLine->text();
+    //short num = enteredPin.toShort();
+
+    if (enteredPin == correctPin && cardtype == 1) {
+
+        qDebug() << "Oikea pin";
+
+        //jos rest-api puolella url muuttuu, niin tähän myös muutos
+        QString site_url="http://localhost:3000/users/user";
+        QNetworkRequest request((site_url));
+
+        //WEBTOKEN ALKU
+        //QByteArray myToken="Bearer "+webToken;
+        //request.setRawHeader(QByteArray("Authorization"),(myToken));
+        //WEBTOKEN LOPPU
+
+        pgetManager = new QNetworkAccessManager(this);
+        connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
+        preply = pgetManager->get(request);
+
+    } else {
+        ui->insertPinLabel->setText("Väärä PIN-koodi");
+    }*/
+}
+
+void addPin::getPinSlot(QNetworkReply *preplyPin)
+{
+    response_dataPin=preplyPin->readAll();
+    qDebug()<<"DATA : "+response_dataPin;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(response_dataPin);
+    QJsonObject json_obj = json_doc.object();
+    correctPin=json_obj["pin"].toString();
+    cardtype = json_obj["cardtype"].toInt();
+    /*foreach (const QJsonValue &value, json_array) {
+        QJsonObject json_obj = value.toObject();
+        correctPin = json_obj["pin"].toString();
+        cardtype = json_obj ["cardtype"].toInt();
+        break; // Keskeytetään silmukka, kun haluttu arvo löytyy
+    }*/
+    qDebug() << "Correct PIN: " << correctPin;
+    qDebug() << "Card type: " << cardtype; // Tulosta myös kortin tyyppi
+
+    qDebug() << "GetPinSlot funktiossa";
+
     // Luetaan syötetty arvo
     QString enteredPin = ui->pinLine->text();
-    short num = enteredPin.toShort();
+    //short num = enteredPin.toShort();
 
-    if (num == correctPin) {
+    if (enteredPin == correctPin && cardtype == 1) {
 
         qDebug() << "Oikea pin";
 

@@ -27,8 +27,8 @@ accountBalance::~accountBalance()
 void accountBalance::handleBackClicked()
 {
     // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow2 = new mainUserInterface();
-    mainUserInterfaceWindow2->show();
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+    mainUserInterfaceWindow->show();
 
     //suljetaan nykyinen ikkuna
     this->close();

@@ -22,7 +22,7 @@ mainUserInterface::mainUserInterface(QWidget *parent)
 
     connect(ui->logOut, &QPushButton::clicked, this, &mainUserInterface::logoutClicked);
     connect(ui->withdrawMoney, &QPushButton::clicked, this, &mainUserInterface::withdrawMoneyClicked);
-    connect(ui->showTransactions, QPushButton::clicked, this, &mainUserInterface::handleWithClicked);
+    connect(ui->showTransactions, QPushButton::clicked, this, &mainUserInterface::handleTransactionsClicked);
     connect(ui->showBalance, QPushButton::clicked, this , &mainUserInterface::getCreditBalanceSlot);
 }
 
@@ -43,7 +43,7 @@ void mainUserInterface::withdrawMoneyClicked()
     this->close();
 }
 
-void mainUserInterface::handleWithClicked()
+void mainUserInterface::handleTransactionsClicked()
 {
     accWithdrawals *accWithdrawalsWindow = new accWithdrawals();
     accWithdrawalsWindow->show();
@@ -90,13 +90,13 @@ void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
 
     foreach (const QJsonValue &value, json_array) {
         QJsonObject json_obj = value.toObject();
-        if (json_obj["idaccount"].toInt() == 1) { // Tarkistetaan idaccountin arvo
+        //if (json_obj["idaccount"].toInt() == 1) { // Tarkistetaan idaccountin arvo
             QString account_balance = json_obj["account_balance"].toString();
             cCredit = account_balance;
             qDebug() << "Account balance: " << cCredit;
             break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
             //cName+=QString::number(json_obj["iduser"].toInt())+", "+json_obj["fname"].toString()+", "+json_obj["lname"].toString()+"\r";
-        }
+       // }
     }
 
     // Luo uusi ikkuna ja käyttöliittymäolio
