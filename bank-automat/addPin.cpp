@@ -9,9 +9,10 @@
 #include <QCloseEvent>
 #include <QtSql>
 
-addPin::addPin(QWidget *parent)
+addPin::addPin(QString cardNumber,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::addPin)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
@@ -102,32 +103,7 @@ void addPin::handlePinInsert()
     connect(pgetManagerPin, SIGNAL(finished(QNetworkReply*)), this, SLOT(getPinSlot(QNetworkReply*)));
     preplyPin = pgetManagerPin->get(requestPin);
 
-    qDebug() << "handlePinInsert funktiossa";
-
-    /*// Luetaan syötetty arvo
-    QString enteredPin = ui->pinLine->text();
-    //short num = enteredPin.toShort();
-
-    if (enteredPin == correctPin && cardtype == 1) {
-
-        qDebug() << "Oikea pin";
-
-        //jos rest-api puolella url muuttuu, niin tähän myös muutos
-        QString site_url="http://localhost:3000/users/user";
-        QNetworkRequest request((site_url));
-
-        //WEBTOKEN ALKU
-        //QByteArray myToken="Bearer "+webToken;
-        //request.setRawHeader(QByteArray("Authorization"),(myToken));
-        //WEBTOKEN LOPPU
-
-        pgetManager = new QNetworkAccessManager(this);
-        connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
-        preply = pgetManager->get(request);
-
-    } else {
-        ui->insertPinLabel->setText("Väärä PIN-koodi");
-    }*/
+    qDebug() << "handlePinInsert funktiossa"; 
 }
 
 void addPin::getPinSlot(QNetworkReply *preplyPin)
@@ -139,12 +115,7 @@ void addPin::getPinSlot(QNetworkReply *preplyPin)
     QJsonObject json_obj = json_doc.object();
     correctPin=json_obj["pin"].toString();
     cardtype = json_obj["cardtype"].toInt();
-    /*foreach (const QJsonValue &value, json_array) {
-        QJsonObject json_obj = value.toObject();
-        correctPin = json_obj["pin"].toString();
-        cardtype = json_obj ["cardtype"].toInt();
-        break; // Keskeytetään silmukka, kun haluttu arvo löytyy
-    }*/
+
     qDebug() << "Correct PIN: " << correctPin;
     qDebug() << "Card type: " << cardtype; // Tulosta myös kortin tyyppi
 
@@ -154,8 +125,9 @@ void addPin::getPinSlot(QNetworkReply *preplyPin)
     QString enteredPin = ui->pinLine->text();
     //short num = enteredPin.toShort();
 
-    if (enteredPin == correctPin && cardtype == 1) {
+    if (enteredPin == correctPin && cardtype == 0 && cardNumber == "-0600062093\r\n>")
 
+    {
         qDebug() << "Oikea pin";
 
         //jos rest-api puolella url muuttuu, niin tähän myös muutos

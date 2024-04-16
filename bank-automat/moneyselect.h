@@ -24,9 +24,25 @@ public:
 private:
     Ui::moneySelect *ui;
 
+    QNetworkAccessManager *putManager;
+    QNetworkReply *reply;
+    QByteArray response_data;
+
 private slots:
     void handleBackToMenu();
     void handleOtherAmount();
+
+    void twentyEuroClickedSlot();
+    void update20Slot(QNetworkReply *reply);
+
+    void fortyEuroClickedSlot();
+    void update40Slot(QNetworkReply *reply);
+
+    void fiftyEuroClickedSlot();
+    void update50Slot(QNetworkReply *reply);
+
+    void hundredEuroClickedSlot();
+    void update100Slot(QNetworkReply *reply);
 };
 
 #endif // MONEYSELECT_H

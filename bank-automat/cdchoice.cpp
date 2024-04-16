@@ -5,9 +5,10 @@
 #include <QProcess>
 #include <QCloseEvent>
 
-cdChoice::cdChoice(QWidget *parent)
+cdChoice::cdChoice(QString cardNumber,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::cdChoice)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
@@ -36,7 +37,7 @@ void cdChoice::creditClicked()
 
     // Luo uusi ikkuna ja käyttöliittymäolio
 
-    addPin *addPinWindow = new addPin();
+    addPin *addPinWindow = new addPin(cardNumber);
     addPinWindow->show();
 }
 
@@ -46,7 +47,7 @@ void cdChoice::debitClicked()
     this->close();
 
     // Luo uusi ikkuna ja käyttöliittymäolio
-    addPin *addPinWindow = new addPin();
+    addPin *addPinWindow = new addPin(cardNumber);
     addPinWindow->show();
 }
 

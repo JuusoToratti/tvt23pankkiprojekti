@@ -52,7 +52,7 @@ void MainWindow::handleCardDetected(QString cardID)
 
         cardNumber = cardID;
         //suljetaan nykyinen ikkuna
-        addPin *addPinWindow = new addPin();
+        addPin *addPinWindow = new addPin(cardNumber);
         this->close();
         addPinWindow->show();
 
@@ -61,7 +61,7 @@ void MainWindow::handleCardDetected(QString cardID)
         cardNumber = cardID;
         // Avaa ikkuna 2
         ui->begin->setText("CD-kortti");
-        cdChoice * cdChoiceWindow = new cdChoice();
+        cdChoice * cdChoiceWindow = new cdChoice(cardNumber);
         this->close();
         cdChoiceWindow->show();
     } else {

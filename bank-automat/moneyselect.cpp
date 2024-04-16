@@ -17,6 +17,10 @@ moneySelect::moneySelect(QWidget *parent)
 
     connect(ui->backToMenu, &QPushButton::clicked, this, &moneySelect::handleBackToMenu);
     connect(ui->selectAmount, &QPushButton::clicked, this, &moneySelect::handleOtherAmount);
+    connect(ui->twentyEuro, &QPushButton::clicked, this, &moneySelect::twentyEuroClickedSlot);
+    connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedSlot);
+    connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedSlot);
+    connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedSlot);
 }
 
 moneySelect::~moneySelect()
@@ -44,3 +48,141 @@ void moneySelect::handleOtherAmount()
     //suljetaan nykyinen ikkuna
     this->close();
 }
+
+void moneySelect::twentyEuroClickedSlot()
+{
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",20);
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN LOPPU*/
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update20Slot(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+}
+
+void moneySelect::update20Slot(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
+}
+
+void moneySelect::fortyEuroClickedSlot()
+{
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",40);
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN LOPPU*/
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update40Slot(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+}
+
+void moneySelect::update40Slot(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
+}
+
+void moneySelect::fiftyEuroClickedSlot()
+{
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",50);
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN LOPPU*/
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update50Slot(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+}
+
+void moneySelect::update50Slot(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
+}
+
+void moneySelect::hundredEuroClickedSlot()
+{
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",100);
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN LOPPU*/
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update100Slot(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+}
+
+void moneySelect::update100Slot(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
+
+    // Analysoi vastaus JSON-muotoon
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    // Tarkista, onko nosto onnistunut
+    if (jsonObject["success"].toBool()) {
+        // Tarkista, että uusi saldo on saatavilla ja tilin saldo pysyy positiivisena
+        if (jsonObject.contains("account_balance")) {
+            int newBalance = jsonObject["account_balance"].toInt();
+            if (newBalance >= 0) {
+                // Nosto onnistui ja tilin saldo pysyy positiivisena
+                ui->chooseLabel->setText("Nosto onnistui");
+            } else {
+                // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+                ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
+            }
+        } else {
+            // Uusi saldo puuttuu vastauksesta
+            ui->chooseLabel->setText("Vastauksessa ei ole uutta saldoa");
+        }
+    } else {
+        // Nosto epäonnistui
+        ui->chooseLabel->setText("Nosto epäonnistui");
+    }
+}
+

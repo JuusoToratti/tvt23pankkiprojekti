@@ -23,12 +23,19 @@ private:
     Ui::selectAmount *ui;
     QString enteredNum;
 
+    QNetworkAccessManager *putManager;
+    QNetworkReply *reply;
+    QByteArray response_data;
+
+    double newAccountBalance = 0.0;
+
 private slots:
-    void handleInsertedNum();
     void numClickedHandler();
     void clearLe();
     void backToMoneySelect();
     void checkAmount();
+
+    void selectAnyAmount (QNetworkReply *reply);
 };
 
 #endif // SELECTAMOUNT_H

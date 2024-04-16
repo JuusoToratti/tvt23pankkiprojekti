@@ -18,7 +18,7 @@ class addPin : public QWidget{
     Q_OBJECT
 
 public:
-    explicit addPin(QWidget *parent = nullptr);
+    explicit addPin(QString cardNumber, QWidget *parent = nullptr);
     ~addPin();
 
 private:
@@ -35,6 +35,8 @@ private:
     QNetworkAccessManager *pgetManagerPin;
     QNetworkReply *preplyPin;
     QByteArray response_dataPin;
+
+    QString cardNumber;
 
 private slots:
     void handlePinInsert();

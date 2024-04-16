@@ -34,11 +34,6 @@ selectAmount::~selectAmount()
     delete ui;
 }
 
-void selectAmount::handleInsertedNum()
-{
-
-}
-
 void selectAmount::numClickedHandler()
 {
     QPushButton *button = qobject_cast<QPushButton*>(sender());
@@ -68,11 +63,43 @@ void selectAmount::checkAmount()
     QString enteredNum = ui->amountLe->text();
     int n = enteredNum.toInt();
 
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",n );
+
+    double newAccountBalance = jsonObj.value("account_balance").toDouble();
+    newAccountBalance = newAccountBalance - n;
+
+
     if (n % 5 != 0) {
         //Nostettava määrä ei ole jaollinen viidellä
         ui->infoLabel->setText("Summaa ei voi nostaa");
+    } else if (newAccountBalance <= 0 ) {
+        //Ei tarpeeksi rahaa tilillä
+        ui->infoLabel->setText("Tilillä ei katetta");
     } else {
-        //Tähän onnistunut muu nosto
+        // Onnistunut nosto, päivitä tilin saldo ja lähetä pyyntö palvelimelle
         ui->infoLabel->setText("Summa nostettu");
-    }
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN */
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(selectAnyAmount(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+ }
+}
+
+void selectAmount::selectAnyAmount(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
 }
