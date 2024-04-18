@@ -8,6 +8,11 @@
 #include "accwithdrawals.h"
 #include "ui_accwithdrawals.h"
 #include <QProcess>
+#include <QStandardItem>
+
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
 
 mainUserInterface::mainUserInterface(QWidget *parent)
     : QWidget(parent)
@@ -22,8 +27,8 @@ mainUserInterface::mainUserInterface(QWidget *parent)
 
     connect(ui->logOut, &QPushButton::clicked, this, &mainUserInterface::logoutClicked);
     connect(ui->withdrawMoney, &QPushButton::clicked, this, &mainUserInterface::withdrawMoneyClicked);
-    connect(ui->showTransactions, QPushButton::clicked, this, &mainUserInterface::handleTransactionsClicked);
-    connect(ui->showBalance, QPushButton::clicked, this , &mainUserInterface::getCreditBalanceSlot);
+    connect(ui->showTransactions, &QPushButton::clicked, this, &mainUserInterface::handleTransactionsClicked);
+    connect(ui->showBalance, &QPushButton::clicked, this , &mainUserInterface::getCreditBalanceSlot);
 }
 
 mainUserInterface::~mainUserInterface()
@@ -45,17 +50,58 @@ void mainUserInterface::withdrawMoneyClicked()
 
 void mainUserInterface::handleTransactionsClicked()
 {
+    QString site_url="http://localhost:3000/accountinformation/info";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    getManager = new QNetworkAccessManager(this);
+    connect(getManager, SIGNAL(finished(QNetworkReply*)),this, SLOT(transactionsNetworkReqFin(QNetworkReply*)));
+    reply = getManager->get(request);
+}
+
+void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
+{
+    //Tilitapahtumat
+
+    QByteArray transResponse_data=reply->readAll();
+    QJsonDocument json_doc = QJsonDocument::fromJson(transResponse_data);
+    QJsonArray json_array = json_doc.array();
+    QString accInfo;
+
+    QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),4);
+    table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Tilinumero"));
+    table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Noston numero"));
+    table_model->setHeaderData(2, Qt::Horizontal, QObject::tr("Määrä"));
+    table_model->setHeaderData(3, Qt::Horizontal, QObject::tr("Päiväys"));
+
+    for (int row = 0; row < json_array.size(); ++row) {
+        QJsonObject json_obj = json_array[row].toObject(); // Määritellään json_obj tässä
+        QStandardItem *idaccount = new QStandardItem(QString::number(json_obj["idaccount"].toInt()));
+        table_model->setItem(row, 0, idaccount);
+        QStandardItem *transactions = new QStandardItem(json_obj["transactions"].toString());
+        table_model->setItem(row, 1, transactions);
+        QStandardItem *amount = new QStandardItem(json_obj["amount"].toString());
+        table_model->setItem(row, 2, amount);
+        QStandardItem *date = new QStandardItem(json_obj["date"].toString());
+        table_model->setItem(row, 3, date);
+    }
+
+    qDebug()<<accInfo;
+
+    // Etsi accwithdrawals-ikkuna ja aseta model sen transTableWidget:iin
     accWithdrawals *accWithdrawalsWindow = new accWithdrawals();
+    accWithdrawalsWindow->transTableWidget(table_model);
     accWithdrawalsWindow->show();
 
     // Suljetaan mainUserInterface-ikkuna
     this->close();
+
+    reply->deleteLater();
+    getManager->deleteLater();
 }
 
 void mainUserInterface::getCreditBalanceSlot()
 {
-    //Debit balance alla
-
     //jos rest-api puolella url muuttuu, niin tähän myös muutos
     QString site_url="http://localhost:3000/accounts/getaccountbalance";
     QNetworkRequest request((site_url));
@@ -66,25 +112,13 @@ void mainUserInterface::getCreditBalanceSlot()
     //WEBTOKEN ALKU
     //QByteArray myToken="Bearer "+webToken;
     //request.setRawHeader(QByteArray("Authorization"),(myToken));
-    //WEBTOKEN LOPPU
-
-    //Rahanostot alla
-
-    //jos rest-api puolella url muuttuu, niin tähän myös muutos
-    QString transSite_url="http://localhost:3000/accountinformation/info";
-    QNetworkRequest transRequest((transSite_url));
-
-    transPgetManager = new QNetworkAccessManager(this);
-    connect(transPgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(showTransactionsSlot(QNetworkReply*)));
-    transPreply = transPgetManager->get(transRequest);
-    //WEBTOKEN ALKU
-    //QByteArray myToken="Bearer "+webToken;
-    //request.setRawHeader(QByteArray("Authorization"),(myToken));
-    //WEBTOKEN LOPPU
+    //WEBTOKEN LOPPU  
 }
 
 void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
 {
+    //Debit balance alla
+
     qDebug()<<"onNetworkfinished funktiossa";
 
     QByteArray response_data=preply->readAll();
@@ -111,66 +145,11 @@ void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
         creditLabel->setText(cCredit);
     }
     accountBalanceWindow->show();
-
     //suljetaan nykyinen ikkuna
     this->close();
 
     preply->deleteLater();
     pgetManager->deleteLater();
-}
-
-void mainUserInterface::showTransactionsSlot(QNetworkReply *transPreply)
-{
-    qDebug()<<"showtransactions funktiossa";
-
-    QByteArray transResponse_data=transPreply->readAll();
-    qDebug()<<"DATA : "+transResponse_data;
-
-    QJsonDocument json_doc = QJsonDocument::fromJson(transResponse_data);
-    QJsonArray json_array = json_doc.array();
-
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    accountBalance *accountBalanceWindow = new accountBalance();
-
-    QTableWidget *transTableWidget = accountBalanceWindow->findChild<QTableWidget*>("transTableWidget");
-
-    if (transTableWidget) {
-
-        int row = 1;
-
-        foreach (const QJsonValue &value, json_array) {
-            QJsonObject json_obj = value.toObject();
-
-            int idAccount = json_obj["idaccount"].toInt();
-            QString transactions = json_obj["transactions"].toString();
-            QString amount = json_obj["amount"].toString();
-            QString date = json_obj["date"].toString();
-
-            qDebug() << "idaccount: " << idAccount;
-            qDebug() << "transactions: " << transactions;
-            qDebug() << "amount: " << amount;
-            qDebug() << "date:  " << date;
-
-            qDebug() << "Rows in table:" << transTableWidget->rowCount();
-            qDebug() << "Columns in table:" << transTableWidget->columnCount();
-
-        // Lisää tiedot soluihin
-        qDebug() << "Adding data to row:" << row;
-        transTableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(idAccount)));
-        transTableWidget->setItem(row, 1, new QTableWidgetItem(transactions));
-        transTableWidget->setItem(row, 2, new QTableWidgetItem((amount)));
-        transTableWidget->setItem(row, 3, new QTableWidgetItem(date));
-
-        // Siirry seuraavaan riviin
-        row++;
-    }
-
-    } else {
-        qDebug() << "transTableWidget not found!";
-    }
-
-    transPreply->deleteLater();
-    transPgetManager->deleteLater();
 }
 
 void mainUserInterface::logoutClicked()

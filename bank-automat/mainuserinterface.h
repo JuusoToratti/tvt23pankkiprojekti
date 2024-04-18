@@ -26,22 +26,23 @@ public:
 private:
     Ui::mainUserInterface *ui;
 
+    QNetworkAccessManager *getManager;
+    QNetworkReply *reply;
+    QByteArray transResponse_data;
+
     QNetworkAccessManager *pgetManager;
     QNetworkReply *preply;
     QByteArray response_data;
 
-    QNetworkAccessManager *transPgetManager;
-    QNetworkReply *transPreply;
-    QByteArray transResponse_data;
-
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
-   void handleTransactionsClicked();
 
    void getCreditBalanceSlot ();
    void onNetworkRequestFinished(QNetworkReply *preply);
-   void showTransactionsSlot(QNetworkReply *transPreply);
+
+   void handleTransactionsClicked();
+   void transactionsNetworkReqFin(QNetworkReply *reply);
 };
 
 #endif // MAINUSERINTERFACE_H

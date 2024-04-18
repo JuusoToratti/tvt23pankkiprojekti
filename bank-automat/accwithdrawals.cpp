@@ -2,7 +2,7 @@
 #include "ui_accwithdrawals.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <QStandardItem>
 
 accWithdrawals::accWithdrawals(QWidget *parent)
     : QWidget(parent)
@@ -20,6 +20,11 @@ accWithdrawals::accWithdrawals(QWidget *parent)
 accWithdrawals::~accWithdrawals()
 {
     delete ui;
+}
+
+void accWithdrawals::transTableWidget(QStandardItemModel *model)
+{
+    ui->transTableWidget->setModel(model);
 }
 
 void accWithdrawals::handleBack()

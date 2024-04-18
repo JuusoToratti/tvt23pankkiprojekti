@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>328</height>
+    <width>436</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,71 +21,15 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>431</width>
-     <height>281</height>
+     <width>421</width>
+     <height>81</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="4" column="1" colspan="2">
-     <widget class="QTableWidget" name="transTableWidget">
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <row/>
-      <column>
-       <property name="text">
-        <string>idaccount</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>transactions</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>amount</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>date</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="creditLabel">
+    <item row="2" column="2">
+     <widget class="QLabel" name="debitlabel">
       <property name="text">
        <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QPushButton" name="logoutButton2">
-      <property name="text">
-       <string>Kirjaudu ulos</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="debitBalLabel">
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;TILIN SALDO / DEBIT&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -102,8 +46,8 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="debitlabel">
+    <item row="2" column="1">
+     <widget class="QLabel" name="creditLabel">
       <property name="text">
        <string/>
       </property>
@@ -112,20 +56,27 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QPushButton" name="backButton">
+    <item row="3" column="2">
+     <widget class="QPushButton" name="logoutButton2">
       <property name="text">
-       <string>Palaa takaisin</string>
+       <string>Kirjaudu ulos</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="1" colspan="2">
-     <widget class="QLabel" name="lastFiveEvents">
+    <item row="1" column="1">
+     <widget class="QLabel" name="debitBalLabel">
       <property name="text">
-       <string>Viimeaikaiset tilitapahtumat:</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;TILIN SALDO / DEBIT&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QPushButton" name="backButton">
+      <property name="text">
+       <string>Palaa takaisin</string>
       </property>
      </widget>
     </item>

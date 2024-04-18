@@ -21,6 +21,7 @@ moneySelect::moneySelect(QWidget *parent)
     connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedSlot);
     connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedSlot);
     connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedSlot);
+    //Tämä painike on olemassa testaustarkoituksiin
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedSlot);
 }
 
@@ -220,8 +221,9 @@ void moneySelect::update100Slot(QNetworkReply *reply)
         // Nosto onnistui ja tilin saldo pysyy positiivisena
         ui->chooseLabel->setText("Nosto onnistui");
     }
-
 }
+
+//Alla olevat funktiot ovat testaustarkoituksiin
 
 void moneySelect::insertHundredClickedSlot()
 {

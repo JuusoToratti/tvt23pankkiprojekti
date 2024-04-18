@@ -63,25 +63,14 @@ void selectAmount::checkAmount()
     QString enteredNum = ui->amountLe->text();
     int n = enteredNum.toInt();
 
-    if (n % 5 != 0) {
-        //Nostettava määrä ei ole jaollinen viidellä
-        ui->infoLabel->setText("Summaa ei voi nostaa");
-        return;
-    }
+    if (n % 5 != 0)
+    {
+        // Ei voi nostaa
+        ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
+    } else {
 
     QJsonObject jsonObj;
-    double newAccountBalance = jsonObj.value("account_balance").toDouble();
-    newAccountBalance = newAccountBalance - n;
-
     jsonObj.insert("account_balance",n );
-
-    /*if (newAccountBalance <= 0 ) {
-        //Ei tarpeeksi rahaa tilillä
-        ui->infoLabel->setText("Tilillä ei katetta");
-        return;
-    }*/
-        // Onnistunut nosto, päivitä tilin saldo ja lähetä pyyntö palvelimelle
-        ui->infoLabel->setText("Summa nostettu");
 
     QString site_url="http://localhost:3000/accounts/update";
     QNetworkRequest request((site_url));
@@ -96,6 +85,7 @@ void selectAmount::checkAmount()
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(selectAnyAmount(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    }
  }
 
 
@@ -105,4 +95,20 @@ void selectAmount::selectAnyAmount(QNetworkReply *reply)
     qDebug()<<response_data;
     reply->deleteLater();
     putManager->deleteLater();
+
+    // Analysoi vastaus JSON-muotoon
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    int changed=jsonObject["changedRows"].toInt();
+    qDebug()<<"Changed="<<changed;
+
+    if (changed == 0)
+     {
+      // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+      ui->infoLabel->setText("Summaa ei voi nostaa");
+     } else {
+            // Nosto onnistui ja tilin saldo pysyy positiivisena
+            ui->infoLabel->setText("Nosto onnistui");
+            }
 }
