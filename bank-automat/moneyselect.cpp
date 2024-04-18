@@ -21,6 +21,7 @@ moneySelect::moneySelect(QWidget *parent)
     connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedSlot);
     connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedSlot);
     connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedSlot);
+    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedSlot);
 }
 
 moneySelect::~moneySelect()
@@ -30,7 +31,6 @@ moneySelect::~moneySelect()
 
 void moneySelect::handleBackToMenu()
 {
-
     // Luo uusi ikkuna ja käyttöliittymäolio
     mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
     mainUserInterfaceWindow->show();
@@ -64,7 +64,7 @@ void moneySelect::twentyEuroClickedSlot()
     WEBTOKEN LOPPU*/
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update20Slot(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update20Slot(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
@@ -75,6 +75,21 @@ void moneySelect::update20Slot(QNetworkReply *reply)
     qDebug()<<response_data;
     reply->deleteLater();
     putManager->deleteLater();
+
+    // Analysoi vastaus JSON-muotoon
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    int changed=jsonObject["changedRows"].toInt();
+    qDebug()<<"Changed="<<changed;
+
+    if (changed == 0)
+    {   // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+        ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
+    } else {
+        // Nosto onnistui ja tilin saldo pysyy positiivisena
+        ui->chooseLabel->setText("Nosto onnistui");
+    }
 }
 
 void moneySelect::fortyEuroClickedSlot()
@@ -92,7 +107,7 @@ void moneySelect::fortyEuroClickedSlot()
     WEBTOKEN LOPPU*/
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update40Slot(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update40Slot(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
@@ -103,6 +118,21 @@ void moneySelect::update40Slot(QNetworkReply *reply)
     qDebug()<<response_data;
     reply->deleteLater();
     putManager->deleteLater();
+
+    // Analysoi vastaus JSON-muotoon
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    int changed=jsonObject["changedRows"].toInt();
+    qDebug()<<"Changed="<<changed;
+
+    if (changed == 0)
+    {   // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+        ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
+    } else {
+        // Nosto onnistui ja tilin saldo pysyy positiivisena
+        ui->chooseLabel->setText("Nosto onnistui");
+    }
 }
 
 void moneySelect::fiftyEuroClickedSlot()
@@ -120,7 +150,7 @@ void moneySelect::fiftyEuroClickedSlot()
     WEBTOKEN LOPPU*/
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update50Slot(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update50Slot(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
@@ -128,10 +158,26 @@ void moneySelect::fiftyEuroClickedSlot()
 void moneySelect::update50Slot(QNetworkReply *reply)
 {
     response_data=reply->readAll();
+    qDebug()<<"TEST1";
     qDebug()<<response_data;
     reply->deleteLater();
     putManager->deleteLater();
-}
+
+    // Analysoi vastaus JSON-muotoon
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    int changed=jsonObject["changedRows"].toInt();
+    qDebug()<<"Changed="<<changed;
+
+    if (changed == 0)
+    {   // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+        ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
+    } else {
+        // Nosto onnistui ja tilin saldo pysyy positiivisena
+        ui->chooseLabel->setText("Nosto onnistui");
+    }
+ }
 
 void moneySelect::hundredEuroClickedSlot()
 {
@@ -148,7 +194,7 @@ void moneySelect::hundredEuroClickedSlot()
     WEBTOKEN LOPPU*/
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(update100Slot(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update100Slot(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
@@ -164,25 +210,45 @@ void moneySelect::update100Slot(QNetworkReply *reply)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
     QJsonObject jsonObject = jsonResponse.object();
 
-    // Tarkista, onko nosto onnistunut
-    if (jsonObject["success"].toBool()) {
-        // Tarkista, että uusi saldo on saatavilla ja tilin saldo pysyy positiivisena
-        if (jsonObject.contains("account_balance")) {
-            int newBalance = jsonObject["account_balance"].toInt();
-            if (newBalance >= 0) {
-                // Nosto onnistui ja tilin saldo pysyy positiivisena
-                ui->chooseLabel->setText("Nosto onnistui");
-            } else {
-                // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
-                ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
-            }
-        } else {
-            // Uusi saldo puuttuu vastauksesta
-            ui->chooseLabel->setText("Vastauksessa ei ole uutta saldoa");
-        }
+    int changed=jsonObject["changedRows"].toInt();
+    qDebug()<<"Changed="<<changed;
+
+    if (changed == 0)
+    {   // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
+        ui->chooseLabel->setText("Tilillä ei ole tarpeeksi katetta");
     } else {
-        // Nosto epäonnistui
-        ui->chooseLabel->setText("Nosto epäonnistui");
+        // Nosto onnistui ja tilin saldo pysyy positiivisena
+        ui->chooseLabel->setText("Nosto onnistui");
     }
+
 }
 
+void moneySelect::insertHundredClickedSlot()
+{
+    QJsonObject jsonObj;
+    jsonObj.insert("account_balance",-100);
+
+    QString site_url="http://localhost:3000/accounts/update";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    /*WEBTOKEN ALKU
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    WEBTOKEN LOPPU*/
+
+    putManager = new QNetworkAccessManager(this);
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateInsertedMoneySlot(QNetworkReply*)));
+
+    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+
+    ui->chooseLabel->setText("100 € lisätty tilille");
+}
+
+void moneySelect::updateInsertedMoneySlot(QNetworkReply *reply)
+{
+    response_data=reply->readAll();
+    qDebug()<<response_data;
+    reply->deleteLater();
+    putManager->deleteLater();
+}

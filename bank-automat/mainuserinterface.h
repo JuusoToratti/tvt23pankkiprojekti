@@ -30,6 +30,10 @@ private:
     QNetworkReply *preply;
     QByteArray response_data;
 
+    QNetworkAccessManager *transPgetManager;
+    QNetworkReply *transPreply;
+    QByteArray transResponse_data;
+
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
@@ -37,6 +41,7 @@ private slots:
 
    void getCreditBalanceSlot ();
    void onNetworkRequestFinished(QNetworkReply *preply);
+   void showTransactionsSlot(QNetworkReply *transPreply);
 };
 
 #endif // MAINUSERINTERFACE_H

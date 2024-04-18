@@ -43,6 +43,9 @@ private slots:
 
     void hundredEuroClickedSlot();
     void update100Slot(QNetworkReply *reply);
+
+    void insertHundredClickedSlot();
+    void updateInsertedMoneySlot(QNetworkReply *reply);
 };
 
 #endif // MONEYSELECT_H

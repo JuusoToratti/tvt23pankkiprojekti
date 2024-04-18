@@ -27,7 +27,7 @@ private:
     QNetworkReply *reply;
     QByteArray response_data;
 
-    double newAccountBalance = 0.0;
+    double newAccountBalance;
 
 private slots:
     void numClickedHandler();

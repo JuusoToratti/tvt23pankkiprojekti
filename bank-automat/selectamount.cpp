@@ -63,20 +63,23 @@ void selectAmount::checkAmount()
     QString enteredNum = ui->amountLe->text();
     int n = enteredNum.toInt();
 
-    QJsonObject jsonObj;
-    jsonObj.insert("account_balance",n );
-
-    double newAccountBalance = jsonObj.value("account_balance").toDouble();
-    newAccountBalance = newAccountBalance - n;
-
-
     if (n % 5 != 0) {
         //Nostettava määrä ei ole jaollinen viidellä
         ui->infoLabel->setText("Summaa ei voi nostaa");
-    } else if (newAccountBalance <= 0 ) {
+        return;
+    }
+
+    QJsonObject jsonObj;
+    double newAccountBalance = jsonObj.value("account_balance").toDouble();
+    newAccountBalance = newAccountBalance - n;
+
+    jsonObj.insert("account_balance",n );
+
+    /*if (newAccountBalance <= 0 ) {
         //Ei tarpeeksi rahaa tilillä
         ui->infoLabel->setText("Tilillä ei katetta");
-    } else {
+        return;
+    }*/
         // Onnistunut nosto, päivitä tilin saldo ja lähetä pyyntö palvelimelle
         ui->infoLabel->setText("Summa nostettu");
 
@@ -90,11 +93,11 @@ void selectAmount::checkAmount()
     WEBTOKEN */
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(selectAnyAmount(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(selectAnyAmount(QNetworkReply*)));
 
     reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
  }
-}
+
 
 void selectAmount::selectAnyAmount(QNetworkReply *reply)
 {

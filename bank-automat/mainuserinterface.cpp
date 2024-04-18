@@ -54,6 +54,8 @@ void mainUserInterface::handleTransactionsClicked()
 
 void mainUserInterface::getCreditBalanceSlot()
 {
+    //Debit balance alla
+
     //jos rest-api puolella url muuttuu, niin tähän myös muutos
     QString site_url="http://localhost:3000/accounts/getaccountbalance";
     QNetworkRequest request((site_url));
@@ -65,38 +67,40 @@ void mainUserInterface::getCreditBalanceSlot()
     //QByteArray myToken="Bearer "+webToken;
     //request.setRawHeader(QByteArray("Authorization"),(myToken));
     //WEBTOKEN LOPPU
+
+    //Rahanostot alla
+
+    //jos rest-api puolella url muuttuu, niin tähän myös muutos
+    QString transSite_url="http://localhost:3000/accountinformation/info";
+    QNetworkRequest transRequest((transSite_url));
+
+    transPgetManager = new QNetworkAccessManager(this);
+    connect(transPgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(showTransactionsSlot(QNetworkReply*)));
+    transPreply = transPgetManager->get(transRequest);
+    //WEBTOKEN ALKU
+    //QByteArray myToken="Bearer "+webToken;
+    //request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN LOPPU
 }
 
 void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
 {
+    qDebug()<<"onNetworkfinished funktiossa";
+
     QByteArray response_data=preply->readAll();
     qDebug()<<"DATA : "+response_data;
 
     QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
     QJsonArray json_array = json_doc.array();
-    //QString idaccount=json_array.at(0)["idaccount"].toString();
-
 
     QString cCredit;
 
-    /*for (const QJsonValue &value : json_array) {
-        QJsonObject json_obj = value.toObject();
-        int idaccount = json_obj["idaccount"].toInt();
-        if (idaccount == 1) {
-            cCredit = json_obj["account_balance"].toString();
-            break;
-        }
-    }*/
-
     foreach (const QJsonValue &value, json_array) {
         QJsonObject json_obj = value.toObject();
-        //if (json_obj["idaccount"].toInt() == 1) { // Tarkistetaan idaccountin arvo
-            QString account_balance = json_obj["account_balance"].toString();
-            cCredit = account_balance;
-            qDebug() << "Account balance: " << cCredit;
-            break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
-            //cName+=QString::number(json_obj["iduser"].toInt())+", "+json_obj["fname"].toString()+", "+json_obj["lname"].toString()+"\r";
-       // }
+         QString account_balance = json_obj["account_balance"].toString();
+          cCredit = account_balance;
+           qDebug() << "Account balance: " << cCredit;
+            //break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
     }
 
     // Luo uusi ikkuna ja käyttöliittymäolio
@@ -115,20 +119,67 @@ void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
     pgetManager->deleteLater();
 }
 
+void mainUserInterface::showTransactionsSlot(QNetworkReply *transPreply)
+{
+    qDebug()<<"showtransactions funktiossa";
+
+    QByteArray transResponse_data=transPreply->readAll();
+    qDebug()<<"DATA : "+transResponse_data;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(transResponse_data);
+    QJsonArray json_array = json_doc.array();
+
+    // Luo uusi ikkuna ja käyttöliittymäolio
+    accountBalance *accountBalanceWindow = new accountBalance();
+
+    QTableWidget *transTableWidget = accountBalanceWindow->findChild<QTableWidget*>("transTableWidget");
+
+    if (transTableWidget) {
+
+        int row = 1;
+
+        foreach (const QJsonValue &value, json_array) {
+            QJsonObject json_obj = value.toObject();
+
+            int idAccount = json_obj["idaccount"].toInt();
+            QString transactions = json_obj["transactions"].toString();
+            QString amount = json_obj["amount"].toString();
+            QString date = json_obj["date"].toString();
+
+            qDebug() << "idaccount: " << idAccount;
+            qDebug() << "transactions: " << transactions;
+            qDebug() << "amount: " << amount;
+            qDebug() << "date:  " << date;
+
+            qDebug() << "Rows in table:" << transTableWidget->rowCount();
+            qDebug() << "Columns in table:" << transTableWidget->columnCount();
+
+        // Lisää tiedot soluihin
+        qDebug() << "Adding data to row:" << row;
+        transTableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(idAccount)));
+        transTableWidget->setItem(row, 1, new QTableWidgetItem(transactions));
+        transTableWidget->setItem(row, 2, new QTableWidgetItem((amount)));
+        transTableWidget->setItem(row, 3, new QTableWidgetItem(date));
+
+        // Siirry seuraavaan riviin
+        row++;
+    }
+
+    } else {
+        qDebug() << "transTableWidget not found!";
+    }
+
+    transPreply->deleteLater();
+    transPgetManager->deleteLater();
+}
+
 void mainUserInterface::logoutClicked()
 {
     qDebug() << "logoutclickedissä";
-
 
     // Sulje sovellus kokonaan
     qApp->quit();
 
     // Käynnistä sovellus uudelleen
     QProcess::startDetached(QApplication::applicationFilePath());
-
-    //this->close();
-
-    //Avataan pääikkuna (mainwindow.ui)
-    //MainWindow *mainWindow = new MainWindow();
-    //mainWindow->show();
 }
