@@ -15,6 +15,7 @@ accWithdrawals::accWithdrawals(QWidget *parent)
     this->setPalette(palette);
 
     connect(ui->withBackButton, &QPushButton::clicked, this, &accWithdrawals::handleBack);
+    connect(ui->deleteActionsButton, &QPushButton::clicked, this, &accWithdrawals::clearAccountEvents);
 }
 
 accWithdrawals::~accWithdrawals()
@@ -35,4 +36,15 @@ void accWithdrawals::handleBack()
 
     //suljetaan nykyinen ikkuna
     this->close();
+}
+
+void accWithdrawals::clearAccountEvents()
+{
+    qDebug() << "Nostot tyhjennetty";
+
+    // Tyhjennä transTableWidget
+    QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->transTableWidget->model());
+    if (model) {
+        model->removeRows(1, model->rowCount() - 1);
+    }
 }

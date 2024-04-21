@@ -17,10 +17,18 @@ moneySelect::moneySelect(QWidget *parent)
 
     connect(ui->backToMenu, &QPushButton::clicked, this, &moneySelect::handleBackToMenu);
     connect(ui->selectAmount, &QPushButton::clicked, this, &moneySelect::handleOtherAmount);
-    connect(ui->twentyEuro, &QPushButton::clicked, this, &moneySelect::twentyEuroClickedSlot);
-    connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedSlot);
-    connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedSlot);
-    connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedSlot);
+
+    connect(ui->twentyEuro, &QPushButton::clicked, this, &moneySelect::twentyEuroClickedPut);
+    connect(ui->twentyEuro, &QPushButton::clicked, this, &moneySelect::twentyEuroClickedPost);
+
+    connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedPut);
+    connect(ui->fortyEuro, &QPushButton::clicked, this, &moneySelect::fortyEuroClickedPost);
+
+    connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedPut);
+    connect(ui->fiftyEuro, &QPushButton::clicked, this, &moneySelect::fiftyEuroClickedPost);
+
+    connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedPut);
+    connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedPost);
     //Tämä painike on olemassa testaustarkoituksiin
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedSlot);
 }
@@ -50,14 +58,16 @@ void moneySelect::handleOtherAmount()
     this->close();
 }
 
-void moneySelect::twentyEuroClickedSlot()
+void moneySelect::twentyEuroClickedPut()
 {
-    QJsonObject jsonObj;
-    jsonObj.insert("account_balance",20);
+    // PUT-metodi
 
-    QString site_url="http://localhost:3000/accounts/update";
-    QNetworkRequest request((site_url));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QJsonObject putObj;
+    putObj.insert("account_balance",20);
+
+    QString put_url="http://localhost:3000/accounts/update";
+    QNetworkRequest putRequest((put_url));
+    putRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     /*WEBTOKEN ALKU
     QByteArray myToken="Bearer "+webToken;
@@ -65,20 +75,23 @@ void moneySelect::twentyEuroClickedSlot()
     WEBTOKEN LOPPU*/
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update20Slot(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(put20Slot(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    QJsonDocument putDoc(putObj);
+    QByteArray putData = putDoc.toJson();
+
+    putReply = putManager->put(putRequest, putData);
 }
 
-void moneySelect::update20Slot(QNetworkReply *reply)
+void moneySelect::put20Slot(QNetworkReply *putReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=putReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 
     // Analysoi vastaus JSON-muotoon
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
     int changed=jsonObject["changedRows"].toInt();
@@ -93,7 +106,38 @@ void moneySelect::update20Slot(QNetworkReply *reply)
     }
 }
 
-void moneySelect::fortyEuroClickedSlot()
+void moneySelect::twentyEuroClickedPost()
+{
+    // POST-metodi
+
+    QJsonObject postObj;
+    postObj.insert("idaccount", 1); //tähän oikea arvo
+    postObj.insert("transactions", "1"); //tähän oikea arvo
+    postObj.insert("amount", 20);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+    QString post_url = "http://localhost:3000/accountinformation/create";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    postManager = new QNetworkAccessManager(this);
+    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(post20Slot(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReply = postManager->post(postRequest, postData);
+}
+
+void moneySelect::post20Slot(QNetworkReply *postReply)
+{
+    postResponse_data=postReply->readAll();
+    qDebug()<<postResponse_data;
+    postReply->deleteLater();
+    postManager->deleteLater();
+}
+
+void moneySelect::fortyEuroClickedPut()
 {
     QJsonObject jsonObj;
     jsonObj.insert("account_balance",40);
@@ -110,18 +154,18 @@ void moneySelect::fortyEuroClickedSlot()
     putManager = new QNetworkAccessManager(this);
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update40Slot(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    putReply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
 
-void moneySelect::update40Slot(QNetworkReply *reply)
+void moneySelect::put40Slot(QNetworkReply *PutReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=PutReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 
     // Analysoi vastaus JSON-muotoon
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
     int changed=jsonObject["changedRows"].toInt();
@@ -136,7 +180,38 @@ void moneySelect::update40Slot(QNetworkReply *reply)
     }
 }
 
-void moneySelect::fiftyEuroClickedSlot()
+void moneySelect::fortyEuroClickedPost()
+{
+    // POST-metodi
+
+    QJsonObject postObj;
+    postObj.insert("idaccount", 1); //tähän oikea arvo
+    postObj.insert("transactions", "1"); //tähän oikea arvo
+    postObj.insert("amount", 40);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+    QString post_url = "http://localhost:3000/accountinformation/create";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    postManager = new QNetworkAccessManager(this);
+    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(post40Slot(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReply = postManager->post(postRequest, postData);
+}
+
+void moneySelect::post40Slot(QNetworkReply *postReply)
+{
+    postResponse_data=postReply->readAll();
+    qDebug()<<postResponse_data;
+    postReply->deleteLater();
+    postManager->deleteLater();
+}
+
+void moneySelect::fiftyEuroClickedPut()
 {
     QJsonObject jsonObj;
     jsonObj.insert("account_balance",50);
@@ -153,19 +228,18 @@ void moneySelect::fiftyEuroClickedSlot()
     putManager = new QNetworkAccessManager(this);
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update50Slot(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    putReply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
 
-void moneySelect::update50Slot(QNetworkReply *reply)
+void moneySelect::put50Slot(QNetworkReply *putReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<"TEST1";
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=putReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 
     // Analysoi vastaus JSON-muotoon
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
     int changed=jsonObject["changedRows"].toInt();
@@ -180,7 +254,38 @@ void moneySelect::update50Slot(QNetworkReply *reply)
     }
  }
 
-void moneySelect::hundredEuroClickedSlot()
+void moneySelect::fiftyEuroClickedPost()
+{
+    // POST-metodi
+
+    QJsonObject postObj;
+    postObj.insert("idaccount", 1); //tähän oikea arvo
+    postObj.insert("transactions", "1"); //tähän oikea arvo
+    postObj.insert("amount", 50);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+    QString post_url = "http://localhost:3000/accountinformation/create";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    postManager = new QNetworkAccessManager(this);
+    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(post20Slot(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReply = postManager->post(postRequest, postData);
+}
+
+void moneySelect::post50Slot(QNetworkReply *postReply)
+{
+    postResponse_data=postReply->readAll();
+    qDebug()<<postResponse_data;
+    postReply->deleteLater();
+    postManager->deleteLater();
+}
+
+void moneySelect::hundredEuroClickedPut()
 {
     QJsonObject jsonObj;
     jsonObj.insert("account_balance",100);
@@ -197,18 +302,18 @@ void moneySelect::hundredEuroClickedSlot()
     putManager = new QNetworkAccessManager(this);
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(update100Slot(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    putReply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 }
 
-void moneySelect::update100Slot(QNetworkReply *reply)
+void moneySelect::put100Slot(QNetworkReply *putReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=putReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 
     // Analysoi vastaus JSON-muotoon
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
     int changed=jsonObject["changedRows"].toInt();
@@ -221,6 +326,37 @@ void moneySelect::update100Slot(QNetworkReply *reply)
         // Nosto onnistui ja tilin saldo pysyy positiivisena
         ui->chooseLabel->setText("Nosto onnistui");
     }
+}
+
+void moneySelect::hundredEuroClickedPost()
+{
+    // POST-metodi
+
+    QJsonObject postObj;
+    postObj.insert("idaccount", 1); //tähän oikea arvo
+    postObj.insert("transactions", "1"); //tähän oikea arvo
+    postObj.insert("amount", 100);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+    QString post_url = "http://localhost:3000/accountinformation/create";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    postManager = new QNetworkAccessManager(this);
+    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(post20Slot(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReply = postManager->post(postRequest, postData);
+}
+
+void moneySelect::post100Slot(QNetworkReply *postReply)
+{
+    postResponse_data=postReply->readAll();
+    qDebug()<<postResponse_data;
+    postReply->deleteLater();
+    postManager->deleteLater();
 }
 
 //Alla olevat funktiot ovat testaustarkoituksiin
@@ -242,15 +378,15 @@ void moneySelect::insertHundredClickedSlot()
     putManager = new QNetworkAccessManager(this);
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(updateInsertedMoneySlot(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    putReply = putManager->put(request, QJsonDocument(jsonObj).toJson());
 
     ui->chooseLabel->setText("100 € lisätty tilille");
 }
 
-void moneySelect::updateInsertedMoneySlot(QNetworkReply *reply)
+void moneySelect::updateInsertedMoneySlot(QNetworkReply *putReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=putReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 }

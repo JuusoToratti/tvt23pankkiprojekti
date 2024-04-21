@@ -27,6 +27,7 @@ private:
 
 private slots:
     void handleBack();
+    void clearAccountEvents();
 };
 
 #endif // ACCWITHDRAWALS_H

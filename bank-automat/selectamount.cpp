@@ -24,9 +24,12 @@ selectAmount::selectAmount(QWidget *parent)
     connect(ui->N7, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
     connect(ui->N8, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
     connect(ui->N9, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
+
     connect(ui->wipe, &QPushButton::clicked, this, &selectAmount::clearLe);
     connect(ui->backToMs,  &QPushButton::clicked, this, &selectAmount::backToMoneySelect);
-    connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::checkAmount);
+
+    connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::putAmount);
+    connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::postAmount);
 }
 
 selectAmount::~selectAmount()
@@ -57,7 +60,7 @@ void selectAmount::backToMoneySelect()
     moneySelectWindow->show();
 }
 
-void selectAmount::checkAmount()
+void selectAmount::putAmount()
 {
     // Luetaan syötetty arvo
     QString enteredNum = ui->amountLe->text();
@@ -82,22 +85,21 @@ void selectAmount::checkAmount()
     WEBTOKEN */
 
     putManager = new QNetworkAccessManager(this);
-    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(selectAnyAmount(QNetworkReply*)));
+    connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(putSelectAnyAmount(QNetworkReply*)));
 
-    reply = putManager->put(request, QJsonDocument(jsonObj).toJson());
+    putReply = putManager->put(request, QJsonDocument(jsonObj).toJson());
     }
  }
 
-
-void selectAmount::selectAnyAmount(QNetworkReply *reply)
+void selectAmount::putSelectAnyAmount(QNetworkReply *putReply)
 {
-    response_data=reply->readAll();
-    qDebug()<<response_data;
-    reply->deleteLater();
+    putResponse_data=putReply->readAll();
+    qDebug()<<putResponse_data;
+    putReply->deleteLater();
     putManager->deleteLater();
 
     // Analysoi vastaus JSON-muotoon
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(response_data);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
     int changed=jsonObject["changedRows"].toInt();
@@ -111,4 +113,45 @@ void selectAmount::selectAnyAmount(QNetworkReply *reply)
             // Nosto onnistui ja tilin saldo pysyy positiivisena
             ui->infoLabel->setText("Nosto onnistui");
             }
+}
+
+void selectAmount::postAmount()
+{
+    // POST-metodi
+
+    QString enteredNum = ui->amountLe->text();
+    int n = enteredNum.toInt();
+
+    if (n % 5 != 0)
+    {
+        // Ei voi nostaa
+        ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
+    } else {
+
+    QJsonObject postObj;
+    postObj.insert("idaccount", 1); //tähän oikea arvo
+    postObj.insert("transactions", "1"); //tähän oikea arvo
+    postObj.insert("amount", n);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+    QString post_url = "http://localhost:3000/accountinformation/create";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    postManager = new QNetworkAccessManager(this);
+    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postSelectAnyAmount(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReply = postManager->post(postRequest, postData);
+    }
+}
+
+void selectAmount::postSelectAnyAmount(QNetworkReply *postReply)
+{
+    postResponse_data=postReply->readAll();
+    qDebug()<<postResponse_data;
+    postReply->deleteLater();
+    postManager->deleteLater();
 }

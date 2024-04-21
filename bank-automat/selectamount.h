@@ -24,8 +24,12 @@ private:
     QString enteredNum;
 
     QNetworkAccessManager *putManager;
-    QNetworkReply *reply;
-    QByteArray response_data;
+    QNetworkReply *putReply;
+    QByteArray putResponse_data;
+
+    QNetworkAccessManager *postManager;
+    QNetworkReply *postReply;
+    QByteArray postResponse_data;
 
     double newAccountBalance;
 
@@ -33,9 +37,12 @@ private slots:
     void numClickedHandler();
     void clearLe();
     void backToMoneySelect();
-    void checkAmount();
 
-    void selectAnyAmount (QNetworkReply *reply);
+    void putAmount();
+    void putSelectAnyAmount (QNetworkReply *putReply);
+
+    void postAmount();
+    void postSelectAnyAmount(QNetworkReply *postReply);
 };
 
 #endif // SELECTAMOUNT_H

@@ -25,27 +25,40 @@ private:
     Ui::moneySelect *ui;
 
     QNetworkAccessManager *putManager;
-    QNetworkReply *reply;
-    QByteArray response_data;
+    QNetworkReply *putReply;
+    QByteArray putResponse_data;
+
+    QNetworkAccessManager *postManager;
+    QNetworkReply *postReply;
+    QByteArray postResponse_data;
 
 private slots:
     void handleBackToMenu();
     void handleOtherAmount();
 
-    void twentyEuroClickedSlot();
-    void update20Slot(QNetworkReply *reply);
+    void twentyEuroClickedPut();
+    void put20Slot(QNetworkReply *putReply);
+    void twentyEuroClickedPost();
+    void post20Slot(QNetworkReply *postReply);
 
-    void fortyEuroClickedSlot();
-    void update40Slot(QNetworkReply *reply);
 
-    void fiftyEuroClickedSlot();
-    void update50Slot(QNetworkReply *reply);
+    void fortyEuroClickedPut();
+    void put40Slot(QNetworkReply *putReply);
+    void fortyEuroClickedPost();
+    void post40Slot(QNetworkReply *postReply);
 
-    void hundredEuroClickedSlot();
-    void update100Slot(QNetworkReply *reply);
+    void fiftyEuroClickedPut();
+    void put50Slot(QNetworkReply *putReply);
+    void fiftyEuroClickedPost();
+    void post50Slot(QNetworkReply *postReply);
+
+    void hundredEuroClickedPut();
+    void put100Slot(QNetworkReply *putReply);
+    void hundredEuroClickedPost();
+    void post100Slot(QNetworkReply *postReply);
 
     void insertHundredClickedSlot();
-    void updateInsertedMoneySlot(QNetworkReply *reply);
+    void updateInsertedMoneySlot(QNetworkReply *putReply);
 };
 
 #endif // MONEYSELECT_H
