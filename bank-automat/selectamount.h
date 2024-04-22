@@ -31,6 +31,11 @@ private:
     QNetworkReply *postReply;
     QByteArray postResponse_data;
 
+    QNetworkAccessManager *getManager;
+    QNetworkReply *getReply;
+    QByteArray getResponse_data;
+
+
     double newAccountBalance;
 
 private slots:
@@ -41,8 +46,9 @@ private slots:
     void putAmount();
     void putSelectAnyAmount (QNetworkReply *putReply);
 
-    void postAmount();
-    void postSelectAnyAmount(QNetworkReply *postReply);
+    void getAmount();
+    void postSelectAnyAmount(QNetworkReply *getReply);
+    void postAnyAmount(QNetworkReply *postReply);
 };
 
 #endif // SELECTAMOUNT_H

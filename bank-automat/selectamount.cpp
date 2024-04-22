@@ -29,7 +29,7 @@ selectAmount::selectAmount(QWidget *parent)
     connect(ui->backToMs,  &QPushButton::clicked, this, &selectAmount::backToMoneySelect);
 
     connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::putAmount);
-    connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::postAmount);
+    connect(ui->withdrawSa, &QPushButton::clicked, this, &selectAmount::getAmount);
 }
 
 selectAmount::~selectAmount()
@@ -115,40 +115,83 @@ void selectAmount::putSelectAnyAmount(QNetworkReply *putReply)
             }
 }
 
-void selectAmount::postAmount()
+void selectAmount::getAmount()
+{
+    // Suorita GET-pyyntö tilin saldon hakemiseksi
+    QString site_url = "http://localhost:3000/accounts/getaccountbalance";
+    QNetworkRequest getRequest(site_url);
+
+    getManager = new QNetworkAccessManager(this);
+    connect(getManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postSelectAnyAmount(QNetworkReply*)));
+    getReply = getManager->get(getRequest);
+}
+
+void selectAmount::postSelectAnyAmount(QNetworkReply *getReply)
 {
     // POST-metodi
 
-    QString enteredNum = ui->amountLe->text();
-    int n = enteredNum.toInt();
+    // Varmista, että vastaus on saatavilla ja ei ole tapahtunut virhettä
+        if (getReply->error() == QNetworkReply::NoError) {
+        QByteArray response_data = getReply->readAll();
+        qDebug() << "GET-pyynnön vastaus: " << response_data;
 
-    if (n % 5 != 0)
-    {
-        // Ei voi nostaa
-        ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
-    } else {
+        // Käsittele vastaus JSON-muodossa
+        QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
+        QJsonArray json_array = json_doc.array();
 
-    QJsonObject postObj;
-    postObj.insert("idaccount", 1); //tähän oikea arvo
-    postObj.insert("transactions", "1"); //tähän oikea arvo
-    postObj.insert("amount", n);
-    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+        QString cCredit;
 
-    QString post_url = "http://localhost:3000/accountinformation/create";
-    QNetworkRequest postRequest(post_url);
-    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        foreach (const QJsonValue &value, json_array) {
+            QJsonObject json_obj = value.toObject();
+            QString account_balance = json_obj["account_balance"].toString();
+            cCredit = account_balance;
+            qDebug() << "Account balance: " << cCredit;
+        }
 
-    postManager = new QNetworkAccessManager(this);
-    connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postSelectAnyAmount(QNetworkReply*)));
+        QString enteredNum = ui->amountLe->text();
+        int n = enteredNum.toInt();
 
-    QJsonDocument postDoc(postObj);
-    QByteArray postData = postDoc.toJson();
+        if (n % 5 != 0)
+        {
+            // Ei voi nostaa
+            ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
+        } else {
+        // Tarkista tilin saldo ja tee POST-pyyntö vain, jos saldo riittää
+        if (cCredit.toDouble() >= n) {
 
-    postReply = postManager->post(postRequest, postData);
-    }
+        QJsonObject postObj;
+        postObj.insert("idaccount", 1); //tähän oikea arvo
+        postObj.insert("transactions", "1"); //tähän oikea arvo
+        postObj.insert("amount", -n);
+        postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+
+        QString post_url = "http://localhost:3000/accountinformation/create";
+        QNetworkRequest postRequest(post_url);
+        postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        postManager = new QNetworkAccessManager(this);
+        connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postAnyAmount(QNetworkReply*)));
+
+        QJsonDocument postDoc(postObj);
+        QByteArray postData = postDoc.toJson();
+
+        postReply = postManager->post(postRequest, postData);
+        } else {
+            qDebug() << "Tilillä ei ole tarpeeksi katetta";
+            // Tähän voit lisätä tarvittavan logiikan, esim. käyttäjälle näytettävän virheilmoituksen
+          }
+         }
+        } else {
+            qDebug() << "Virhe GET-pyynnön suorittamisessa: " << getReply->errorString();
+            // Tähän voit lisätä tarvittavan virheen käsittelyn
+        }
+
+        // Vapauta resurssit
+        getReply->deleteLater();
+        getManager->deleteLater();
 }
 
-void selectAmount::postSelectAnyAmount(QNetworkReply *postReply)
+void selectAmount::postAnyAmount(QNetworkReply *postReply)
 {
     postResponse_data=postReply->readAll();
     qDebug()<<postResponse_data;

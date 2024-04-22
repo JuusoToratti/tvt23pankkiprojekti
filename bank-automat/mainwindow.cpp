@@ -20,6 +20,8 @@
 
 #include "cdchoice.h"
 
+#include <QRegularExpression>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -45,10 +47,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleCardDetected(QString cardID)
 {
+    cardID.remove(QRegularExpression("[\\n\\r>]"));
+
     // Tunnista kortin ID ja avaa oikea ikkuna sen perusteella
     qDebug() << "Kortista luetut tiedot:" << cardID;
 
-    if (cardID == "-0600062093\r\n>") {
+    if (cardID == "-0600062093") {
 
         cardNumber = cardID;
         //suljetaan nykyinen ikkuna
@@ -56,7 +60,7 @@ void MainWindow::handleCardDetected(QString cardID)
         this->close();
         addPinWindow->show();
 
-    } else if (cardID == "-06000621FE\r\n>") {
+    } else if (cardID == "-06000621FE") {
 
         cardNumber = cardID;
         // Avaa ikkuna 2

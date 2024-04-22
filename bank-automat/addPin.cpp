@@ -125,8 +125,9 @@ void addPin::getPinSlot(QNetworkReply *preplyPin)
     QString enteredPin = ui->pinLine->text();
     //short num = enteredPin.toShort();
 
-    if (enteredPin == correctPin && cardtype == 0 && cardNumber == "-0600062093\r\n>")
+    const int maxWrongAttempts = 3; // Maksimimäärä väärin syötettyjä PIN-yrityksiä
 
+    if (enteredPin == correctPin && cardtype == 0 && cardNumber == "-0600062093")
     {
         qDebug() << "Oikea pin";
 
@@ -145,7 +146,19 @@ void addPin::getPinSlot(QNetworkReply *preplyPin)
 
     } else {
         ui->insertPinLabel->setText("Väärä PIN-koodi");
+        // Lisää väärin syötettyjen PIN-koodien laskuria
+        wrongPinAttempts++;
+
+        // Tarkista, onko saavutettu maksimimäärä väärin syötettyjä PIN-koodien yrityksiä
+        if (wrongPinAttempts >= maxWrongAttempts) {
+            // Estä sisäänpääsy PIN-koodilla
+            ui->insertPinLabel->setText("Liian monta väärää yritystä.");
+            // Estä PIN-koodin syöttäminen
+            ui->pinSubmit->setEnabled(false);
     }
+        // Tulosta väärin syötettyjen PIN-koodien määrä debug-viestinä
+        qDebug() << "Väärin syötettyjen PIN-koodien määrä: " << wrongPinAttempts;
+  }
 }
 
 void addPin::getNamesSlot(QNetworkReply *preply)

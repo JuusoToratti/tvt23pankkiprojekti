@@ -68,25 +68,23 @@ void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
     QJsonArray json_array = json_doc.array();
     QString accInfo;
 
-    QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),4);
-    table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Tilinumero"));
-    table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Noston numero"));
-    table_model->setHeaderData(2, Qt::Horizontal, QObject::tr("Määrä"));
-    table_model->setHeaderData(3, Qt::Horizontal, QObject::tr("Päiväys"));
+    QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),2);
+    //table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Tilinumero"));
+    //table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Noston numero"));
+    table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Määrä"));
+    table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Päiväys"));
 
     for (int row = 0; row < json_array.size(); ++row) {
         QJsonObject json_obj = json_array[row].toObject(); // Määritellään json_obj tässä
-        QStandardItem *idaccount = new QStandardItem(QString::number(json_obj["idaccount"].toInt()));
-        table_model->setItem(row, 0, idaccount);
-        QStandardItem *transactions = new QStandardItem(json_obj["transactions"].toString());
-        table_model->setItem(row, 1, transactions);
+       // QStandardItem *idaccount = new QStandardItem(QString::number(json_obj["idaccount"].toInt()));
+       // table_model->setItem(row, 0, idaccount);
+       // QStandardItem *transactions = new QStandardItem(json_obj["transactions"].toString());
+        //table_model->setItem(row, 1, transactions);
         QStandardItem *amount = new QStandardItem(json_obj["amount"].toString());
-        table_model->setItem(row, 2, amount);
+        table_model->setItem(row, 0, amount);
         QStandardItem *date = new QStandardItem(json_obj["date"].toString());
-        table_model->setItem(row, 3, date);
+        table_model->setItem(row, 1, date);
     }
-
-    qDebug()<<accInfo;
 
     // Etsi accwithdrawals-ikkuna ja aseta model sen transTableWidget:iin
     accWithdrawals *accWithdrawalsWindow = new accWithdrawals();

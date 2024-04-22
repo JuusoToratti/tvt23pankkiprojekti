@@ -38,6 +38,9 @@ private:
 
     QString cardNumber;
 
+    // Resetoi väärin syötettyjen PIN-koodien laskuri
+    int wrongPinAttempts = 0;
+
 private slots:
     void handlePinInsert();
     void numberClickedHandler();

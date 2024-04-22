@@ -1,6 +1,7 @@
 #include "rfidreaderdll.h"
 #include <QSerialPortInfo>
 #include <QDebug>
+#include <QRegularExpression>
 
 RFIDReaderdll::RFIDReaderdll(QObject *parent)
     : QObject(parent)

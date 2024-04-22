@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QStandardItem>
 
+
 namespace Ui {
 class accWithdrawals;
 }
@@ -25,9 +26,13 @@ public:
 private:
     Ui::accWithdrawals *ui;
 
+    QNetworkAccessManager *deleteManager;
+    QNetworkReply *deleteReply;
+    QByteArray deleteResponse_data;
+
 private slots:
     void handleBack();
-    void clearAccountEvents();
+    void deleteResource();
 };
 
 #endif // ACCWITHDRAWALS_H
