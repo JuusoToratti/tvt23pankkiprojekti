@@ -33,10 +33,10 @@ MainWindow::MainWindow(QWidget *parent)
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
     this->setPalette(palette);
 
-    // Luo RFID-lukijan olio
+    // Create RFID-reader object
     RFIDReaderdll *rfidReader = new RFIDReaderdll(this);
 
-    // Yhdistä signaali ja slot
+    // Connect signal and slot
     connect(rfidReader, &RFIDReaderdll::cardDetected, this, &MainWindow::handleCardDetected); 
 }
 
@@ -47,15 +47,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleCardDetected(QString cardID)
 {
+    // Remove unnecessary information from the end
     cardID.remove(QRegularExpression("[\\n\\r>]"));
 
-    // Tunnista kortin ID ja avaa oikea ikkuna sen perusteella
+    // Identify the card's ID and open the correct window based on it
     qDebug() << "Kortista luetut tiedot:" << cardID;
 
     if (cardID == "-0600062093") {
 
         cardNumber = cardID;
-        //suljetaan nykyinen ikkuna
+        qDebug() << "Debit-kortti";
         addPin *addPinWindow = new addPin(cardNumber);
         this->close();
         addPinWindow->show();
@@ -63,11 +64,11 @@ void MainWindow::handleCardDetected(QString cardID)
     } else if (cardID == "-06000621FE") {
 
         cardNumber = cardID;
-        // Avaa ikkuna 2
-        ui->begin->setText("CD-kortti");
-        cdChoice * cdChoiceWindow = new cdChoice(cardNumber);
+        qDebug() << "Credit-kortti ";
+        ui->begin->setText("Credit-kortti");
+        addPin *addPinWindow = new addPin(cardNumber);
         this->close();
-        cdChoiceWindow->show();
+        addPinWindow->show();
     } else {
         ui->begin->setText("Korttia ei tunnistettu");
     }

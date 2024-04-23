@@ -17,10 +17,10 @@ class accWithdrawals : public QWidget
     Q_OBJECT
 
 public:
-    explicit accWithdrawals(QWidget *parent = nullptr);
+    explicit accWithdrawals(QByteArray& token, QWidget *parent = nullptr);
     ~accWithdrawals();
 
-    // Julkinen jäsenfunktio transTableWidget
+    // Public member function transTableWidget
     void transTableWidget(QStandardItemModel *model);
 
 private:
@@ -29,6 +29,8 @@ private:
     QNetworkAccessManager *deleteManager;
     QNetworkReply *deleteReply;
     QByteArray deleteResponse_data;
+
+    QByteArray webToken;
 
 private slots:
     void handleBack();

@@ -20,7 +20,7 @@ class mainUserInterface : public QWidget
     Q_OBJECT
 
 public:
-    explicit mainUserInterface(QWidget *parent = nullptr);
+    explicit mainUserInterface(QByteArray& token, QWidget *parent = nullptr);
     ~mainUserInterface();
 
 private:
@@ -33,6 +33,8 @@ private:
     QNetworkAccessManager *pgetManager;
     QNetworkReply *preply;
     QByteArray response_data;
+
+    QByteArray webToken;
 
 private slots:
    void logoutClicked();

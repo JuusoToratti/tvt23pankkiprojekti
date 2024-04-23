@@ -15,15 +15,17 @@ class accountBalance : public QWidget
     Q_OBJECT
 
 public:
-    explicit accountBalance(QWidget *parent = nullptr);
+    explicit accountBalance(QByteArray& token, QWidget *parent = nullptr);
     ~accountBalance();
 
 private:
     Ui::accountBalance *ui;
 
+    QByteArray webToken;
+
 private slots:
     void handleBackClicked();
-    void handleLogoutClicked();
+    void handleLogoutClicked();  
 };
 
 #endif // ACCOUNTBALANCE_H

@@ -3,9 +3,10 @@
 #include "moneyselect.h"
 #include "ui_moneyselect.h"
 
-selectAmount::selectAmount(QWidget *parent)
+selectAmount::selectAmount(QByteArray& token, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::selectAmount)
+    , webToken(token)
 {
     ui->setupUi(this);
 
@@ -55,20 +56,19 @@ void selectAmount::backToMoneySelect()
 {
     close();
 
-    // Avataan pääikkuna (mainwindow.ui)
-    moneySelect *moneySelectWindow = new moneySelect();
+    moneySelect *moneySelectWindow = new moneySelect(webToken);
     moneySelectWindow->show();
 }
 
 void selectAmount::putAmount()
 {
-    // Luetaan syötetty arvo
+    // Read the entered value
     QString enteredNum = ui->amountLe->text();
     int n = enteredNum.toInt();
 
     if (n % 5 != 0)
     {
-        // Ei voi nostaa
+        // Cannot withdraw from ATM
         ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
     } else {
 
@@ -79,10 +79,10 @@ void selectAmount::putAmount()
     QNetworkRequest request((site_url));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    /*WEBTOKEN ALKU
+    //WEBTOKEN START
     QByteArray myToken="Bearer "+webToken;
     request.setRawHeader(QByteArray("Authorization"),(myToken));
-    WEBTOKEN */
+    //WEBTOKEN END
 
     putManager = new QNetworkAccessManager(this);
     connect(putManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(putSelectAnyAmount(QNetworkReply*)));
@@ -98,7 +98,7 @@ void selectAmount::putSelectAnyAmount(QNetworkReply *putReply)
     putReply->deleteLater();
     putManager->deleteLater();
 
-    // Analysoi vastaus JSON-muotoon
+    // Parse the response into JSON format
     QJsonDocument jsonResponse = QJsonDocument::fromJson(putResponse_data);
     QJsonObject jsonObject = jsonResponse.object();
 
@@ -107,19 +107,24 @@ void selectAmount::putSelectAnyAmount(QNetworkReply *putReply)
 
     if (changed == 0)
      {
-      // Tilin saldo menisi miinukselle, ei voida nostaa rahaa
-      ui->infoLabel->setText("Summaa ei voi nostaa");
+      // The account balance would go negative, cannot withdraw money
+      ui->infoLabel->setText("Tilillä ei ole tarpeeksi katetta");
      } else {
-            // Nosto onnistui ja tilin saldo pysyy positiivisena
+            // The withdrawal was successful, and the account balance remains positive
             ui->infoLabel->setText("Nosto onnistui");
             }
 }
 
 void selectAmount::getAmount()
 {
-    // Suorita GET-pyyntö tilin saldon hakemiseksi
-    QString site_url = "http://localhost:3000/accounts/getaccountbalance";
+    // Execute a GET request to retrieve the account balance
+    QString site_url = "http://localhost:3000/accounts/getaccountbalance/1";
     QNetworkRequest getRequest(site_url);
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    getRequest.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
 
     getManager = new QNetworkAccessManager(this);
     connect(getManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postSelectAnyAmount(QNetworkReply*)));
@@ -128,46 +133,46 @@ void selectAmount::getAmount()
 
 void selectAmount::postSelectAnyAmount(QNetworkReply *getReply)
 {
-    // POST-metodi
+    // POST-method
 
-    // Varmista, että vastaus on saatavilla ja ei ole tapahtunut virhettä
+    // Ensure that the response is available and there is no error
         if (getReply->error() == QNetworkReply::NoError) {
         QByteArray response_data = getReply->readAll();
         qDebug() << "GET-pyynnön vastaus: " << response_data;
 
-        // Käsittele vastaus JSON-muodossa
+        // Handle the response in JSON format
         QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
-        QJsonArray json_array = json_doc.array();
 
-        QString cCredit;
-
-        foreach (const QJsonValue &value, json_array) {
-            QJsonObject json_obj = value.toObject();
-            QString account_balance = json_obj["account_balance"].toString();
-            cCredit = account_balance;
-            qDebug() << "Account balance: " << cCredit;
-        }
+        if (json_doc.isObject()) {
+            QJsonObject json_obj = json_doc.object();
+            QString account_balance = json_obj.value("account_balance").toString();
+            qDebug() << "Current account balance: " << account_balance;
 
         QString enteredNum = ui->amountLe->text();
         int n = enteredNum.toInt();
 
         if (n % 5 != 0)
         {
-            // Ei voi nostaa
+            // Cannot withdraw
             ui->infoLabel->setText("Ei tarpeeksi oikeankokoisia seteleitä");
         } else {
-        // Tarkista tilin saldo ja tee POST-pyyntö vain, jos saldo riittää
-        if (cCredit.toDouble() >= n) {
+        // Check the account balance and make the POST request only if the balance is sufficient
+        if (account_balance.toDouble() >= n) {
 
         QJsonObject postObj;
         postObj.insert("idaccount", 1); //tähän oikea arvo
         postObj.insert("transactions", "1"); //tähän oikea arvo
         postObj.insert("amount", -n);
-        postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Lisää nykyinen päivämäärä
+        postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate)); // Add current date
 
         QString post_url = "http://localhost:3000/accountinformation/create";
         QNetworkRequest postRequest(post_url);
         postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        //WEBTOKEN START
+        QByteArray myToken="Bearer "+webToken;
+        postRequest.setRawHeader(QByteArray("Authorization"),(myToken));
+        //WEBTOKEN END
 
         postManager = new QNetworkAccessManager(this);
         connect(postManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(postAnyAmount(QNetworkReply*)));
@@ -177,18 +182,16 @@ void selectAmount::postSelectAnyAmount(QNetworkReply *getReply)
 
         postReply = postManager->post(postRequest, postData);
         } else {
-            qDebug() << "Tilillä ei ole tarpeeksi katetta";
-            // Tähän voit lisätä tarvittavan logiikan, esim. käyttäjälle näytettävän virheilmoituksen
+            qDebug() << "Summaa ei voi nostaa";
           }
          }
         } else {
             qDebug() << "Virhe GET-pyynnön suorittamisessa: " << getReply->errorString();
-            // Tähän voit lisätä tarvittavan virheen käsittelyn
         }
-
-        // Vapauta resurssit
+        // Release resources
         getReply->deleteLater();
         getManager->deleteLater();
+ }
 }
 
 void selectAmount::postAnyAmount(QNetworkReply *postReply)

@@ -18,7 +18,7 @@ class moneySelect : public QWidget
     Q_OBJECT
 
 public:
-    explicit moneySelect(QWidget *parent = nullptr);
+    explicit moneySelect(QByteArray& token, QWidget *parent = nullptr);
     ~moneySelect();
 
 private:
@@ -36,11 +36,11 @@ private:
     QNetworkReply *postReply;
     QByteArray postResponse_data;
 
+    QByteArray webToken;
+
 private slots:
     void handleBackToMenu();
     void handleOtherAmount();
-
-
 
     void twentyEuroClickedPut();
     void put20Slot(QNetworkReply *putReply);

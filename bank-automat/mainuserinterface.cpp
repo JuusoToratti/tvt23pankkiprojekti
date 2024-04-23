@@ -14,10 +14,10 @@
 #include <QNetworkAccessManager>
 #include <QJsonDocument>
 
-mainUserInterface::mainUserInterface(QWidget *parent)
+mainUserInterface::mainUserInterface(QByteArray& token, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::mainUserInterface)
-
+    , webToken(token)
 {
     ui->setupUi(this);
 
@@ -38,13 +38,11 @@ mainUserInterface::~mainUserInterface()
 
 void mainUserInterface::withdrawMoneyClicked()
 {
-    qDebug() << "withrdawMoneyClicked funktiossa";
-
-    // Luodaan ja näytetään moneySelect-olio
-    moneySelect *moneySelectWindow = new moneySelect();
+    // Create and show moneySelect-object
+    moneySelect *moneySelectWindow = new moneySelect(webToken);
     moneySelectWindow->show();
 
-    // Suljetaan mainUserInterface-ikkuna
+    // Close mainUserInterface-window
     this->close();
 }
 
@@ -54,6 +52,11 @@ void mainUserInterface::handleTransactionsClicked()
     QNetworkRequest request((site_url));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
     getManager = new QNetworkAccessManager(this);
     connect(getManager, SIGNAL(finished(QNetworkReply*)),this, SLOT(transactionsNetworkReqFin(QNetworkReply*)));
     reply = getManager->get(request);
@@ -61,12 +64,11 @@ void mainUserInterface::handleTransactionsClicked()
 
 void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
 {
-    //Tilitapahtumat
+    //Account transactions
 
     QByteArray transResponse_data=reply->readAll();
     QJsonDocument json_doc = QJsonDocument::fromJson(transResponse_data);
     QJsonArray json_array = json_doc.array();
-    QString accInfo;
 
     QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),2);
     //table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Tilinumero"));
@@ -86,12 +88,12 @@ void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
         table_model->setItem(row, 1, date);
     }
 
-    // Etsi accwithdrawals-ikkuna ja aseta model sen transTableWidget:iin
-    accWithdrawals *accWithdrawalsWindow = new accWithdrawals();
+    // Find the accwithdrawals window and set the model to its transTableWidget
+    accWithdrawals *accWithdrawalsWindow = new accWithdrawals(webToken);
     accWithdrawalsWindow->transTableWidget(table_model);
     accWithdrawalsWindow->show();
 
-    // Suljetaan mainUserInterface-ikkuna
+    // Close mainUserInterface-window
     this->close();
 
     reply->deleteLater();
@@ -100,63 +102,56 @@ void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
 
 void mainUserInterface::getCreditBalanceSlot()
 {
-    //jos rest-api puolella url muuttuu, niin tähän myös muutos
-    QString site_url="http://localhost:3000/accounts/getaccountbalance";
+    //If the URL changes on the REST API side, then there should also be a corresponding change here
+    QString site_url="http://localhost:3000/accounts/getaccountbalance/1";
     QNetworkRequest request((site_url));
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
 
     pgetManager = new QNetworkAccessManager(this);
     connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetworkRequestFinished(QNetworkReply*)));
     preply = pgetManager->get(request);
-    //WEBTOKEN ALKU
-    //QByteArray myToken="Bearer "+webToken;
-    //request.setRawHeader(QByteArray("Authorization"),(myToken));
-    //WEBTOKEN LOPPU  
 }
 
 void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
 {
-    //Debit balance alla
-
-    qDebug()<<"onNetworkfinished funktiossa";
+    //Debit balance
 
     QByteArray response_data=preply->readAll();
     qDebug()<<"DATA : "+response_data;
 
     QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
-    QJsonArray json_array = json_doc.array();
 
-    QString cCredit;
+    if (json_doc.isObject()) {
+        QJsonObject json_obj = json_doc.object();
+        QString account_balance = json_obj.value("account_balance").toString();
+        qDebug() << "Current account balance: " << account_balance;
 
-    foreach (const QJsonValue &value, json_array) {
-        QJsonObject json_obj = value.toObject();
-         QString account_balance = json_obj["account_balance"].toString();
-          cCredit = account_balance;
-           qDebug() << "Account balance: " << cCredit;
-            //break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
-    }
-
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    accountBalance *accountBalanceWindow = new accountBalance();
+    // Create a new window and a user interface object
+    accountBalance *accountBalanceWindow = new accountBalance(webToken);
 
     QLabel *creditLabel = accountBalanceWindow->findChild<QLabel*>("creditLabel");
     if (creditLabel) {
-        creditLabel->setText(cCredit);
+        creditLabel->setText(account_balance);
     }
     accountBalanceWindow->show();
-    //suljetaan nykyinen ikkuna
+
+    // Close the current window
     this->close();
 
     preply->deleteLater();
     pgetManager->deleteLater();
+ }
 }
 
 void mainUserInterface::logoutClicked()
 {
-    qDebug() << "logoutclickedissä";
-
-    // Sulje sovellus kokonaan
+    // Close the app
     qApp->quit();
 
-    // Käynnistä sovellus uudelleen
+    // Restart the app
     QProcess::startDetached(QApplication::applicationFilePath());
 }

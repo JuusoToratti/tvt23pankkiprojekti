@@ -36,10 +36,19 @@ private:
     QNetworkReply *preplyPin;
     QByteArray response_dataPin;
 
+    QNetworkAccessManager *loginManager;
+    QNetworkReply *loginReply;
+    QByteArray loginResponse_data;
+
     QString cardNumber;
 
-    // Resetoi väärin syötettyjen PIN-koodien laskuri
+    // Reset the incorrect PIN attempts counter
     int wrongPinAttempts = 0;
+
+    // Maximum number of incorrect PIN attempts
+    const int maxWrongAttempts = 3;
+
+    QByteArray webToken;
 
 private slots:
     void handlePinInsert();
@@ -48,7 +57,7 @@ private slots:
     void timerTimeout();
 
     void getNamesSlot (QNetworkReply *preply);
-    void getPinSlot (QNetworkReply *preplyPin);
+    void loginSlot(QNetworkReply *loginReply);
 
 protected:
     void closeEvent(QCloseEvent *event);

@@ -20,11 +20,11 @@ addPin::addPin(QString cardNumber,QWidget *parent)
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
     this->setPalette(palette);
 
-    //Liitä QPushButton::clicked-signaali handlePinInsert-slotiin
+    // Join QPushButton::clicked-signal to  handlePinInsert-slot
     connect(ui->pinSubmit,SIGNAL(clicked(bool)),
         this,SLOT(handlePinInsert()));
 
-    // Yhdistä signaalit ja slotit
+    // Connect signals and slots
     connect(ui->n0, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->n1, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->n2, &QPushButton::clicked, this, &addPin::numberClickedHandler);
@@ -37,7 +37,7 @@ addPin::addPin(QString cardNumber,QWidget *parent)
     connect(ui->n9, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->clear, &QPushButton::clicked, this, &addPin::clearLineEdit);
 
-    // Luodaan timeri joka sulkee addPin.ui ja avaa MainWindow.ui 60 sekunnin jälkeen
+    // Create timer which closes addPin.ui and opens  MainWindow.ui after 60 seconds
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &addPin::timerTimeout);
     timer->start(60000);  
@@ -55,32 +55,25 @@ void addPin::clearLineEdit()
 
 void addPin::timerTimeout()
 {
-    qDebug() << "Aika loppui";
+    qDebug() << "Time has run out";
 
-    // Close the addPin window
-    // this->close();
-
-    // Create a new MainWindow and show it
-    // MainWindow *mainWindow = new MainWindow();
-    // mainWindow->show();
-
-    // Sulje sovellus kokonaan
+    // Close the app
     qApp->quit();
 
-    // Käynnistä sovellus uudelleen
+    // Restarts the application
     QProcess::startDetached(QApplication::applicationFilePath());
 }
 
 void addPin::closeEvent(QCloseEvent *event)
 {
-    // Pysäytetään timer kun addPin.ui sulkeutuu
+    // Stop the timer when addPin.ui closes
     timer->stop();
     event->accept();
 }
 
 void addPin::numberClickedHandler()
 {
-    //Castaa klikatut numerot pinLine-tekstikenttään
+    // Cast the clicked numbers into the pinLine text field
     QPushButton *button = qobject_cast<QPushButton*>(sender());
     if (button) {
         QString number = button->text();
@@ -90,55 +83,48 @@ void addPin::numberClickedHandler()
 
 void addPin::handlePinInsert()
 {
-    //jos rest-api puolella url muuttuu, niin tähän myös muutos
-    QString card_url="http://localhost:3000/cardroutes/getcardnumberpin";
-    QNetworkRequest requestPin((card_url));
+    QString correctCardNumber = cardNumber;
+    QString pinNumber = ui->pinLine->text();
+    QJsonObject jsonObj;
+    jsonObj.insert("card_number",correctCardNumber);
+    jsonObj.insert("pin",pinNumber);
 
-    //WEBTOKEN ALKU
-    //QByteArray myToken="Bearer "+webToken;
-    //request.setRawHeader(QByteArray("Authorization"),(myToken));
-    //WEBTOKEN LOPPU
+    QString site_url="http://localhost:3000/login";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    pgetManagerPin = new QNetworkAccessManager(this);
-    connect(pgetManagerPin, SIGNAL(finished(QNetworkReply*)), this, SLOT(getPinSlot(QNetworkReply*)));
-    preplyPin = pgetManagerPin->get(requestPin);
+    loginManager = new QNetworkAccessManager(this);
+    connect(loginManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(loginSlot(QNetworkReply*)));
 
-    qDebug() << "handlePinInsert funktiossa"; 
+    loginReply = loginManager->post(request, QJsonDocument(jsonObj).toJson());
 }
 
-void addPin::getPinSlot(QNetworkReply *preplyPin)
+void addPin::loginSlot(QNetworkReply *loginReply)
 {
-    response_dataPin=preplyPin->readAll();
-    qDebug()<<"DATA : "+response_dataPin;
+    loginResponse_data = loginReply->readAll();
+    webToken = loginResponse_data;
+    QMessageBox msgBox;
 
-    QJsonDocument json_doc = QJsonDocument::fromJson(response_dataPin);
-    QJsonObject json_obj = json_doc.object();
-    correctPin=json_obj["pin"].toString();
-    cardtype = json_obj["cardtype"].toInt();
+    if(loginResponse_data.length()==0){
 
-    qDebug() << "Correct PIN: " << correctPin;
-    qDebug() << "Card type: " << cardtype; // Tulosta myös kortin tyyppi
+        msgBox.setText("Error in the connection");
+        msgBox.exec();
+    }
+    else{
+        if(loginResponse_data!="false"){
 
-    qDebug() << "GetPinSlot funktiossa";
+        qDebug() << "Right PIN";
 
-    // Luetaan syötetty arvo
-    QString enteredPin = ui->pinLine->text();
-    //short num = enteredPin.toShort();
-
-    const int maxWrongAttempts = 3; // Maksimimäärä väärin syötettyjä PIN-yrityksiä
-
-    if (enteredPin == correctPin && cardtype == 0 && cardNumber == "-0600062093")
-    {
-        qDebug() << "Oikea pin";
-
-        //jos rest-api puolella url muuttuu, niin tähän myös muutos
+        //If REST-API changes url, the change is needed here also
         QString site_url="http://localhost:3000/users/user";
         QNetworkRequest request((site_url));
 
-        //WEBTOKEN ALKU
-        //QByteArray myToken="Bearer "+webToken;
-        //request.setRawHeader(QByteArray("Authorization"),(myToken));
-        //WEBTOKEN LOPPU
+        // WEBTOKEN START
+        // Upon successful login, the variable webToken is assigned a value,
+        // which is of type QByteArray, prefixed with the string "Bearer".
+        QByteArray myToken="Bearer "+loginResponse_data;
+        request.setRawHeader(QByteArray("Authorization"),(myToken));
+        // WEBTOKEN END
 
         pgetManager = new QNetworkAccessManager(this);
         connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
@@ -146,19 +132,23 @@ void addPin::getPinSlot(QNetworkReply *preplyPin)
 
     } else {
         ui->insertPinLabel->setText("Väärä PIN-koodi");
-        // Lisää väärin syötettyjen PIN-koodien laskuria
+        // Counter for incorrectly entered PIN codes
         wrongPinAttempts++;
 
-        // Tarkista, onko saavutettu maksimimäärä väärin syötettyjä PIN-koodien yrityksiä
+        // Check if the maximum number of incorrect PIN code attempts has been reached
         if (wrongPinAttempts >= maxWrongAttempts) {
-            // Estä sisäänpääsy PIN-koodilla
+            // Prevent the submitting of PIN
+            // By disabling "OK" button
             ui->insertPinLabel->setText("Liian monta väärää yritystä.");
-            // Estä PIN-koodin syöttäminen
+
             ui->pinSubmit->setEnabled(false);
+        }
+        // Print the number of incorrectly entered PIN codes as a debug message
+        qDebug() << "Number of incorrectly entered PIN codes: " << wrongPinAttempts;
     }
-        // Tulosta väärin syötettyjen PIN-koodien määrä debug-viestinä
-        qDebug() << "Väärin syötettyjen PIN-koodien määrä: " << wrongPinAttempts;
-  }
+    loginReply->deleteLater();
+    loginManager->deleteLater();
+ }
 }
 
 void addPin::getNamesSlot(QNetworkReply *preply)
@@ -172,17 +162,16 @@ void addPin::getNamesSlot(QNetworkReply *preply)
     QString cName;
     foreach (const QJsonValue &value, json_array) {
         QJsonObject json_obj = value.toObject();
-        if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
+        //if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
             QString fname = json_obj["fname"].toString();
             QString lname = json_obj["lname"].toString();
             cName = "Hei " + fname + " " + lname + "!";
             break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
-            //cName+=QString::number(json_obj["iduser"].toInt())+", "+json_obj["fname"].toString()+", "+json_obj["lname"].toString()+"\r";
-        }
+       // }
     }
 
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+    // Create a new window and user interface object
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
 
     QLabel *customerName = mainUserInterfaceWindow->findChild<QLabel*>("customerName");
     if (customerName) {
@@ -190,7 +179,7 @@ void addPin::getNamesSlot(QNetworkReply *preply)
     }
     mainUserInterfaceWindow->show();
 
-    //suljetaan nykyinen ikkuna
+    // Close the current window
     this->close();
 
     preply->deleteLater();

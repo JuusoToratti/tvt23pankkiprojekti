@@ -4,9 +4,10 @@
 #include "ui_mainwindow.h"
 #include <QStandardItem>
 
-accWithdrawals::accWithdrawals(QWidget *parent)
+accWithdrawals::accWithdrawals(QByteArray& token, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::accWithdrawals)
+    , webToken(token)
 {
     ui->setupUi(this);
 
@@ -14,13 +15,13 @@ accWithdrawals::accWithdrawals(QWidget *parent)
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
     this->setPalette(palette);
 
-    // Luo uusi QNetworkAccessManager-olio
+    // Create a new QNetworkAccessManager object
     deleteManager = new QNetworkAccessManager(this);
 
     connect(ui->withBackButton, &QPushButton::clicked, this, &accWithdrawals::handleBack);
     connect(ui->deleteActionsButton, &QPushButton::clicked, this, &accWithdrawals::deleteResource);
 
-    // Aseta transTableWidget
+    // Set the transTableWidget to a new QStandardItemModel object
     transTableWidget(new QStandardItemModel(this));
 }
 
@@ -36,39 +37,42 @@ void accWithdrawals::transTableWidget(QStandardItemModel *model)
 
 void accWithdrawals::handleBack()
 {
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
     mainUserInterfaceWindow->show();
 
-    //suljetaan nykyinen ikkuna
     this->close();
 }
 
 void accWithdrawals::deleteResource()
 {
-    // Luodaan DELETE-pyyntö
+    // Create DELETE-request
     QUrl url("http://localhost:3000/accountinformation/delete");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    // Tee DELETE-pyyntö
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
+    // Make the DELETE request
     QNetworkReply *deleteReply = deleteManager->deleteResource(request);
 
-    // Käsitellään vastaus, kun se saapuu
+    // Handle the response when it arrives
     connect(deleteReply, &QNetworkReply::finished, this, [=]() {
         if (deleteReply->error() == QNetworkReply::NoError) {
-            // Vastaus onnistui
+            // Response successful
             qDebug() << "DELETE-pyyntö onnistui";
-            // Tyhjennä transTableWidget
+            // Clear transTableWidget
             QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->transTableWidget->model());
             if (model) {
                 model->clear();
             }
         } else {
-            // Vastaus epäonnistui
+            // Response failed
             qDebug() << "Virhe DELETE-pyynnön suorittamisessa:" << deleteReply->errorString();
         }
-        // Vapautetaan resurssit
+        // Release resources
         deleteReply->deleteLater();
     });
 }

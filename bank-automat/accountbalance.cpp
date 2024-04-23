@@ -5,9 +5,10 @@
 #include <QCloseEvent>
 #include "mainuserinterface.h"
 
-accountBalance::accountBalance(QWidget *parent)
+accountBalance::accountBalance(QByteArray& token, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::accountBalance)
+    , webToken(token)
 {
     ui->setupUi(this);
 
@@ -26,19 +27,15 @@ accountBalance::~accountBalance()
 
 void accountBalance::handleBackClicked()
 {
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
     mainUserInterfaceWindow->show();
 
-    //suljetaan nykyinen ikkuna
     this->close();
 }
 
 void accountBalance::handleLogoutClicked()
 {
-    // Sulje sovellus kokonaan
     qApp->quit();
 
-    // Käynnistä sovellus uudelleen
     QProcess::startDetached(QApplication::applicationFilePath());
 }

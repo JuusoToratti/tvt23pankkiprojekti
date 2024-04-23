@@ -16,7 +16,7 @@ class selectAmount : public QWidget
     Q_OBJECT
 
 public:
-    explicit selectAmount(QWidget *parent = nullptr);
+    explicit selectAmount(QByteArray& token, QWidget *parent = nullptr);
     ~selectAmount();
 
 private:
@@ -35,6 +35,7 @@ private:
     QNetworkReply *getReply;
     QByteArray getResponse_data;
 
+    QByteArray webToken;
 
     double newAccountBalance;
 

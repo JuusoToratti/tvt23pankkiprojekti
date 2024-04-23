@@ -14,7 +14,6 @@ SOURCES += \
     accountbalance.cpp \
     accwithdrawals.cpp \
     addPin.cpp \
-    cdchoice.cpp \
     main.cpp \
     mainuserinterface.cpp \
     mainwindow.cpp \
@@ -25,7 +24,6 @@ HEADERS += \
     accountbalance.h \
     accwithdrawals.h \
     addPin.h \
-    cdchoice.h \
     mainuserinterface.h \
     mainwindow.h \
     moneyselect.h \
@@ -35,7 +33,6 @@ FORMS += \
     accountbalance.ui \
     accwithdrawals.ui \
     addPin.ui \
-    cdchoice.ui \
     mainuserinterface.ui \
     mainwindow.ui \
     moneyselect.ui \
