@@ -7,14 +7,20 @@
 #include <QTimer>
 #include <QProcess>
 #include <QCloseEvent>
+#include <QtSql>
 
-addPin::addPin(QWidget *parent)
+addPin::addPin(QString cardNumber,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::addPin)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
-    //Liitä QPushButton::clicked-signaali handlePinInsert-slotiin
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
+    // Join QPushButton::clicked-signal to  handlePinInsert-slot
     connect(ui->pinSubmit,SIGNAL(clicked(bool)),
         this,SLOT(handlePinInsert()));
 
@@ -31,10 +37,10 @@ addPin::addPin(QWidget *parent)
     connect(ui->n9, &QPushButton::clicked, this, &addPin::numberClickedHandler);
     connect(ui->clear, &QPushButton::clicked, this, &addPin::clearLineEdit);
 
-    // Create a timer to close the addPin window and open the MainWindow after 60 seconds
+    // Create timer which closes addPin.ui and opens  MainWindow.ui after 60 seconds
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &addPin::timerTimeout);
-    timer->start(60000);
+    timer->start(60000);  
 }
 
 addPin::~addPin()
@@ -49,31 +55,25 @@ void addPin::clearLineEdit()
 
 void addPin::timerTimeout()
 {
-    qDebug() << "Aika loppui";
+    qDebug() << "Time has run out";
 
-    // Close the addPin window
-    // this->close();
-
-    // Create a new MainWindow and show it
-    // MainWindow *mainWindow = new MainWindow();
-    // mainWindow->show();
-
-    // Sulje sovellus kokonaan
+    // Close the app
     qApp->quit();
 
-    // Käynnistä sovellus uudelleen
+    // Restarts the application
     QProcess::startDetached(QApplication::applicationFilePath());
 }
 
 void addPin::closeEvent(QCloseEvent *event)
 {
-    // Stop the timer when addPin window is closed
+    // Stop the timer when addPin.ui closes
     timer->stop();
     event->accept();
 }
 
 void addPin::numberClickedHandler()
 {
+    // Cast the clicked numbers into the pinLine text field
     QPushButton *button = qobject_cast<QPushButton*>(sender());
     if (button) {
         QString number = button->text();
@@ -83,25 +83,105 @@ void addPin::numberClickedHandler()
 
 void addPin::handlePinInsert()
 {
+    QString correctCardNumber = cardNumber;
+    QString pinNumber = ui->pinLine->text();
+    QJsonObject jsonObj;
+    jsonObj.insert("card_number",correctCardNumber);
+    jsonObj.insert("pin",pinNumber);
 
-    qDebug() << "handlePinInsert funktiossa";
+    QString site_url="http://localhost:3000/login";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    // Luetaan syötetty arvo
-    QString enteredPin = ui->pinLine->text();
-    short num = enteredPin.toShort();
+    loginManager = new QNetworkAccessManager(this);
+    connect(loginManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(loginSlot(QNetworkReply*)));
 
-    if (num == correctPin) {
+    loginReply = loginManager->post(request, QJsonDocument(jsonObj).toJson());
+}
 
-        qDebug() << "Oikea pin";
+void addPin::loginSlot(QNetworkReply *loginReply)
+{
+    loginResponse_data = loginReply->readAll();
+    webToken = loginResponse_data;
+    QMessageBox msgBox;
 
-        // Luo uusi ikkuna ja käyttöliittymäolio
-        mainUserInterface *mainUserInterfaceWindow = new mainUserInterface();
-        mainUserInterfaceWindow->show();
+    if(loginResponse_data.length()==0){
 
-        //suljetaan nykyinen ikkuna
-        this->close();
+        msgBox.setText("Error in the connection");
+        msgBox.exec();
+    }
+    else{
+        if(loginResponse_data!="false"){
+
+        qDebug() << "Right PIN";
+
+        //If REST-API changes url, the change is needed here also
+        QString site_url="http://localhost:3000/users/user";
+        QNetworkRequest request((site_url));
+
+        // WEBTOKEN START
+        // Upon successful login, the variable webToken is assigned a value,
+        // which is of type QByteArray, prefixed with the string "Bearer".
+        QByteArray myToken="Bearer "+loginResponse_data;
+        request.setRawHeader(QByteArray("Authorization"),(myToken));
+        // WEBTOKEN END
+
+        pgetManager = new QNetworkAccessManager(this);
+        connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getNamesSlot(QNetworkReply*)));
+        preply = pgetManager->get(request);
 
     } else {
         ui->insertPinLabel->setText("Väärä PIN-koodi");
+        // Counter for incorrectly entered PIN codes
+        wrongPinAttempts++;
+
+        // Check if the maximum number of incorrect PIN code attempts has been reached
+        if (wrongPinAttempts >= maxWrongAttempts) {
+            // Prevent the submitting of PIN
+            // By disabling "OK" button
+            ui->insertPinLabel->setText("Liian monta väärää yritystä.");
+
+            ui->pinSubmit->setEnabled(false);
+        }
+        // Print the number of incorrectly entered PIN codes as a debug message
+        qDebug() << "Number of incorrectly entered PIN codes: " << wrongPinAttempts;
     }
+    loginReply->deleteLater();
+    loginManager->deleteLater();
+ }
+}
+
+void addPin::getNamesSlot(QNetworkReply *preply)
+{
+    response_data=preply->readAll();
+    //qDebug()<<"DATA : "+response_data;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
+    QJsonArray json_array = json_doc.array();
+
+    QString cName;
+    foreach (const QJsonValue &value, json_array) {
+        QJsonObject json_obj = value.toObject();
+        //if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
+            QString fname = json_obj["fname"].toString();
+            QString lname = json_obj["lname"].toString();
+            cName = "Hei " + fname + " " + lname + "!";
+            break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
+       // }
+    }
+
+    // Create a new window and user interface object
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
+
+    QLabel *customerName = mainUserInterfaceWindow->findChild<QLabel*>("customerName");
+    if (customerName) {
+        customerName->setText(cName);
+    }
+    mainUserInterfaceWindow->show();
+
+    // Close the current window
+    this->close();
+
+    preply->deleteLater();
+    pgetManager->deleteLater();
 }

@@ -5,11 +5,16 @@
 #include <QProcess>
 #include <QCloseEvent>
 
-cdChoice::cdChoice(QWidget *parent)
+cdChoice::cdChoice(QString cardNumber,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::cdChoice)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
+
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
 
     connect(ui->creditButton, &QPushButton::clicked, this, &cdChoice::creditClicked);
     connect(ui->debitButton, &QPushButton::clicked, this, &cdChoice::debitClicked);
@@ -32,7 +37,7 @@ void cdChoice::creditClicked()
 
     // Luo uusi ikkuna ja käyttöliittymäolio
 
-    addPin *addPinWindow = new addPin();
+    addPin *addPinWindow = new addPin(cardNumber);
     addPinWindow->show();
 }
 
@@ -42,7 +47,7 @@ void cdChoice::debitClicked()
     this->close();
 
     // Luo uusi ikkuna ja käyttöliittymäolio
-    addPin *addPinWindow = new addPin();
+    addPin *addPinWindow = new addPin(cardNumber);
     addPinWindow->show();
 }
 

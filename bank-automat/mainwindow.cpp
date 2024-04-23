@@ -20,6 +20,8 @@
 
 #include "cdchoice.h"
 
+#include <QRegularExpression>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,10 +29,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Luo RFID-lukijan olio
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
+
+    // Create RFID-reader object
     RFIDReaderdll *rfidReader = new RFIDReaderdll(this);
 
-    // Yhdistä signaali ja slot
+    // Connect signal and slot
     connect(rfidReader, &RFIDReaderdll::cardDetected, this, &MainWindow::handleCardDetected); 
 }
 
@@ -41,22 +47,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleCardDetected(QString cardID)
 {
-    // Tunnista kortin ID ja avaa oikea ikkuna sen perusteella
-    qDebug() << "Lätkästä luetut tiedot:" << cardID;
+    // Remove unnecessary information from the end
+    cardID.remove(QRegularExpression("[\\n\\r>]"));
 
-    if (cardID == "-0600062093\r\n>") {
+    // Identify the card's ID and open the correct window based on it
+    qDebug() << "Kortista luetut tiedot:" << cardID;
 
-        //suljetaan nykyinen ikkuna
-        addPin *addPinWindow = new addPin();
+    if (cardID == "-0600062093") {
+
+        cardNumber = cardID;
+        qDebug() << "Debit-kortti";
+        addPin *addPinWindow = new addPin(cardNumber);
         this->close();
         addPinWindow->show();
 
-    } else if (cardID == "-06000621FE\r\n>") {
-        // Avaa ikkuna 2
-        ui->begin->setText("CD-kortti");
-        cdChoice * cdChoiceWindow = new cdChoice();
+    } else if (cardID == "-06000621FE") {
+
+        cardNumber = cardID;
+        qDebug() << "Credit-kortti ";
+        ui->begin->setText("Credit-kortti");
+        addPin *addPinWindow = new addPin(cardNumber);
         this->close();
-        cdChoiceWindow->show();
+        addPinWindow->show();
     } else {
         ui->begin->setText("Korttia ei tunnistettu");
     }

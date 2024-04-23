@@ -5,11 +5,16 @@
 #include <QCloseEvent>
 #include "mainuserinterface.h"
 
-accountBalance::accountBalance(QWidget *parent)
+accountBalance::accountBalance(QByteArray& token, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::accountBalance)
+    , webToken(token)
 {
     ui->setupUi(this);
+
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
+    this->setPalette(palette);
 
     connect(ui->logoutButton2, &QPushButton::clicked, this, &accountBalance::handleLogoutClicked);
     connect(ui->backButton, &QPushButton::clicked, this, &accountBalance::handleBackClicked);
@@ -22,19 +27,15 @@ accountBalance::~accountBalance()
 
 void accountBalance::handleBackClicked()
 {
-    // Luo uusi ikkuna ja käyttöliittymäolio
-    mainUserInterface *mainUserInterfaceWindow2 = new mainUserInterface();
-    mainUserInterfaceWindow2->show();
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
+    mainUserInterfaceWindow->show();
 
-    //suljetaan nykyinen ikkuna
     this->close();
 }
 
 void accountBalance::handleLogoutClicked()
 {
-    // Sulje sovellus kokonaan
     qApp->quit();
 
-    // Käynnistä sovellus uudelleen
     QProcess::startDetached(QApplication::applicationFilePath());
 }

@@ -24,7 +24,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    //void handleCardDetected(QString cardID);
+
+    QString cardNumber = "";
 
 private slots:
     void handleCardDetected(QString cardID);

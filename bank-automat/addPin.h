@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QLineEdit>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class addPin;
@@ -14,14 +18,37 @@ class addPin : public QWidget{
     Q_OBJECT
 
 public:
-    addPin(QWidget *parent = nullptr);
+    explicit addPin(QString cardNumber, QWidget *parent = nullptr);
     ~addPin();
 
 private:
     Ui::addPin *ui;
-    const short correctPin = 5757;
     QString  enteredPin;
     QTimer *timer;
+    QString correctPin = "";
+    int cardtype = 0;
+
+    QNetworkAccessManager *pgetManager;
+    QNetworkReply *preply;
+    QByteArray response_data;
+
+    QNetworkAccessManager *pgetManagerPin;
+    QNetworkReply *preplyPin;
+    QByteArray response_dataPin;
+
+    QNetworkAccessManager *loginManager;
+    QNetworkReply *loginReply;
+    QByteArray loginResponse_data;
+
+    QString cardNumber;
+
+    // Reset the incorrect PIN attempts counter
+    int wrongPinAttempts = 0;
+
+    // Maximum number of incorrect PIN attempts
+    const int maxWrongAttempts = 3;
+
+    QByteArray webToken;
 
 private slots:
     void handlePinInsert();
@@ -29,6 +56,8 @@ private slots:
     void clearLineEdit();
     void timerTimeout();
 
+    void getNamesSlot (QNetworkReply *preply);
+    void loginSlot(QNetworkReply *loginReply);
 
 protected:
     void closeEvent(QCloseEvent *event);

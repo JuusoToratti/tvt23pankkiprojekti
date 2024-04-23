@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>308</width>
+    <height>184</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,35 +19,17 @@
      <x>20</x>
      <y>20</y>
      <width>261</width>
-     <height>101</height>
+     <height>141</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1">
-     <widget class="QPushButton" name="hundredEuro">
+    <item row="0" column="0" colspan="2">
+     <widget class="QLabel" name="chooseLabel">
       <property name="text">
-       <string>100 €</string>
+       <string>Valitse summa minkä haluat nostaa</string>
       </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="fiftyEuro">
-      <property name="text">
-       <string>50 €</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="fortyEuro">
-      <property name="text">
-       <string>40 €</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="twentyEuro">
-      <property name="text">
-       <string>20 €</string>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -65,13 +47,38 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
-     <widget class="QLabel" name="chooseLabel">
+    <item row="2" column="1">
+     <widget class="QPushButton" name="hundredEuro">
       <property name="text">
-       <string>Valitse summa minkä haluat nostaa</string>
+       <string>100 €</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="fiftyEuro">
+      <property name="text">
+       <string>50 €</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="twentyEuro">
+      <property name="text">
+       <string>20 €</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="fortyEuro">
+      <property name="text">
+       <string>40 €</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="2">
+     <widget class="QPushButton" name="insertMoney">
+      <property name="text">
+       <string>Lisää tilille 100 €</string>
       </property>
      </widget>
     </item>

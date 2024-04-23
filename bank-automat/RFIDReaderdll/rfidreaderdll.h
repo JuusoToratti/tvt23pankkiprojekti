@@ -13,6 +13,7 @@ class RFIDREADERDLL_EXPORT RFIDReaderdll : public QObject
 
 public:
     explicit RFIDReaderdll(QObject *parent = nullptr);
+    QString cardID;
 
 signals:
     void cardDetected(QString cardID);

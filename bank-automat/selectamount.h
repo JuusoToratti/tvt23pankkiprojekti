@@ -3,6 +3,10 @@
 
 #include <QWidget>
 
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+
 namespace Ui {
 class selectAmount;
 }
@@ -12,19 +16,40 @@ class selectAmount : public QWidget
     Q_OBJECT
 
 public:
-    explicit selectAmount(QWidget *parent = nullptr);
+    explicit selectAmount(QByteArray& token, QWidget *parent = nullptr);
     ~selectAmount();
 
 private:
     Ui::selectAmount *ui;
     QString enteredNum;
 
+    QNetworkAccessManager *putManager;
+    QNetworkReply *putReply;
+    QByteArray putResponse_data;
+
+    QNetworkAccessManager *postManager;
+    QNetworkReply *postReply;
+    QByteArray postResponse_data;
+
+    QNetworkAccessManager *getManager;
+    QNetworkReply *getReply;
+    QByteArray getResponse_data;
+
+    QByteArray webToken;
+
+    double newAccountBalance;
+
 private slots:
-    void handleInsertedNum();
     void numClickedHandler();
     void clearLe();
     void backToMoneySelect();
-    void checkAmount();
+
+    void putAmount();
+    void putSelectAnyAmount (QNetworkReply *putReply);
+
+    void getAmount();
+    void postSelectAnyAmount(QNetworkReply *getReply);
+    void postAnyAmount(QNetworkReply *postReply);
 };
 
 #endif // SELECTAMOUNT_H
