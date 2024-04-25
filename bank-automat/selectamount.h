@@ -23,6 +23,7 @@ private:
     Ui::selectAmount *ui;
     QString enteredNum;
 
+    // Debit
     QNetworkAccessManager *putManager;
     QNetworkReply *putReply;
     QByteArray putResponse_data;
@@ -35,10 +36,21 @@ private:
     QNetworkReply *getReply;
     QByteArray getResponse_data;
 
+    // Credit
+    QNetworkAccessManager *putManagerCredit;
+    QNetworkReply *putReplyCredit;
+    QByteArray putResponse_dataCredit;
+
+    QNetworkAccessManager *postManagerCredit;
+    QNetworkReply *postReplyCredit;
+    QByteArray postResponse_dataCredit;
+
+    QNetworkAccessManager *getManagerCredit;
+    QNetworkReply *getReplyCredit;
+    QByteArray getResponse_dataCredit;
+
     QByteArray webToken;
-
     QString cardNumber;
-
     double newAccountBalance;
 
 private slots:
@@ -46,12 +58,23 @@ private slots:
     void clearLe();
     void backToMoneySelect();
 
+    // Debit
+
     void putAmount();
     void putSelectAnyAmount (QNetworkReply *putReply);
 
     void getAmount();
     void postSelectAnyAmount(QNetworkReply *getReply);
     void postAnyAmount(QNetworkReply *postReply);
+
+    // Credit
+
+    void putAmountCredit();
+    void putSelectAnyAmountCredit (QNetworkReply *putReplyCredit);
+
+    void getAmountCredit();
+    void postSelectAnyAmountCredit(QNetworkReply *getReplyCredit);
+    void postAnyAmountCredit(QNetworkReply *postReplyCredit);
 };
 
 #endif // SELECTAMOUNT_H

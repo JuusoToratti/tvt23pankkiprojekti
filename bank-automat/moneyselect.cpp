@@ -43,6 +43,8 @@ moneySelect::moneySelect(QByteArray& token,QString cardNumber, QWidget *parent)
     // For testing purposes
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPut);
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPost);
+    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPutCredit);
+    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPostCredit);
 }
 
 moneySelect::~moneySelect()
@@ -1104,6 +1106,10 @@ void moneySelect::post100SlotCredit(QNetworkReply *postReplyCredit)
 
 void moneySelect::insertHundredClickedPut()
 {
+    // Tarkistetaan kortin numero
+    if (cardNumber != "-0600062093") {
+        return;
+    }
     QJsonObject jsonObj;
     jsonObj.insert("account_balance",-100);
 
@@ -1134,6 +1140,10 @@ void moneySelect::putInsertedMoneySlot(QNetworkReply *putReply)
 
 void moneySelect::insertHundredClickedPost()
 {
+    // Tarkistetaan kortin numero
+    if (cardNumber != "-0600062093") {
+        return;
+    }
     QJsonObject postObj;
     postObj.insert("idaccount", 1);
     postObj.insert("transactions", "1");
@@ -1164,4 +1174,76 @@ void moneySelect::postInsertedMoneySlot(QNetworkReply *postReply)
     qDebug()<<postResponse_data;
     postReply->deleteLater();
     postManager->deleteLater();
+}
+
+void moneySelect::insertHundredClickedPutCredit()
+{
+    // Tarkistetaan kortin numero
+    if (cardNumber != "-06000621FE") {
+        return;
+    }
+    QJsonObject jsonObj;
+    jsonObj.insert("credit_limit",-100);
+
+    QString site_url="http://localhost:3000/accounts/updatecredit";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
+    putManagerCredit = new QNetworkAccessManager(this);
+    connect(putManagerCredit, SIGNAL(finished(QNetworkReply*)), this, SLOT(putInsertedMoneySlotCredit(QNetworkReply*)));
+
+    putReplyCredit = putManagerCredit->put(request, QJsonDocument(jsonObj).toJson());
+
+    ui->chooseLabel->setText("100 € lisätty tilille");
+}
+
+void moneySelect::putInsertedMoneySlotCredit(QNetworkReply *putReplyCredit)
+{
+    putResponse_dataCredit=putReplyCredit->readAll();
+    qDebug()<<putResponse_dataCredit;
+    putReplyCredit->deleteLater();
+    putManagerCredit->deleteLater();
+}
+
+void moneySelect::insertHundredClickedPostCredit()
+{
+    // Tarkistetaan kortin numero
+    if (cardNumber != "-06000621FE") {
+        return;
+    }
+    QJsonObject postObj;
+    postObj.insert("idaccount", 4);
+    postObj.insert("transactions", "1");
+    postObj.insert("amount", +100);
+    postObj.insert("date", QDateTime::currentDateTime().toString(Qt::ISODate));
+
+    QString post_url = "http://localhost:3000/accountinformation/createcredit";
+    QNetworkRequest postRequest(post_url);
+    postRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    postRequest.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
+    postManagerCredit = new QNetworkAccessManager(this);
+    connect(postManagerCredit, SIGNAL(finished(QNetworkReply*)), this, SLOT(postInsertedMoneySlotCredit(QNetworkReply*)));
+
+    QJsonDocument postDoc(postObj);
+    QByteArray postData = postDoc.toJson();
+
+    postReplyCredit = postManagerCredit->post(postRequest, postData);
+}
+
+void moneySelect::postInsertedMoneySlotCredit(QNetworkReply *postReplyCredit)
+{
+    postResponse_dataCredit=postReplyCredit->readAll();
+    qDebug()<<postResponse_dataCredit;
+    postReplyCredit->deleteLater();
+    postManagerCredit->deleteLater();
 }
