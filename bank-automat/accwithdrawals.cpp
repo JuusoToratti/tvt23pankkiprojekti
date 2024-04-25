@@ -4,10 +4,11 @@
 #include "ui_mainwindow.h"
 #include <QStandardItem>
 
-accWithdrawals::accWithdrawals(QByteArray& token, QWidget *parent)
+accWithdrawals::accWithdrawals(QByteArray& token, QString cardNumber, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::accWithdrawals)
     , webToken(token)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
@@ -37,7 +38,7 @@ void accWithdrawals::transTableWidget(QStandardItemModel *model)
 
 void accWithdrawals::handleBack()
 {
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken, cardNumber);
     mainUserInterfaceWindow->show();
 
     this->close();

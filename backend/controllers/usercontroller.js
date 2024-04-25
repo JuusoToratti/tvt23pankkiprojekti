@@ -18,7 +18,9 @@ const getAll = (req, res) => {
     });
 }
 
-const getById = (req, res) => {
+
+
+const getByiduser = (req, res) => {
     if(req.params.id){
         user.getById(req.params.id, function(err,dbResult){
             if(err){
@@ -148,17 +150,17 @@ const updateAvatar = (req, res) => {
 
     upload(req,res, (err) => {
 
-        
+        // check if file is not found 
         if(!req.file){
             return res.json({status:"error", message:"File not found"});
         }
         
-        
+        // return out if multer error
         if(err){
             return res.json({status:"error", message:err});
         }
 
-        
+        // delete old picture
         user.getById(req.iduser, function(err, dbResult){
 
             if(err) {
@@ -182,6 +184,7 @@ const updateAvatar = (req, res) => {
             }
         })
 
+        // get file name of the file
         let filename = req.file.filename;
 
         user.updateAvatar(req.iduser, filename, function(err, dbResult) {
@@ -200,11 +203,27 @@ const updateAvatar = (req, res) => {
     })
 }
 
+
+
+const deleteuser = (req, res) => {
+    if(req.body.iduser){
+        user.deleteuser(req.iduser,function(err, dbResult){
+            if (err) {
+                console.error("Virhe poistettaessa käyttäjää:", err);
+                return res.status(500).json({ error: 'Virhe poistettaessa käyttäjää' });
+            }
+            console.log("Käyttäjä poistettiin onnistuneesti.");
+            return res.status(200).json({ message: 'Käyttäjä poistettiin onnistuneesti' });
+        });
+    }
+};
+
 module.exports = {
     getAll,
     userLogin,
-    userRegister,
-    getById,
     userInfo,
+    userRegister,
+    getByiduser,
     updateAvatar,
+    deleteuser,
 }

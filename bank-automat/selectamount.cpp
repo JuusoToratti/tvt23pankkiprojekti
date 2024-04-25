@@ -3,10 +3,11 @@
 #include "moneyselect.h"
 #include "ui_moneyselect.h"
 
-selectAmount::selectAmount(QByteArray& token, QWidget *parent)
+selectAmount::selectAmount(QByteArray& token, QString cardNumber, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::selectAmount)
     , webToken(token)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
@@ -14,17 +15,13 @@ selectAmount::selectAmount(QByteArray& token, QWidget *parent)
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
     this->setPalette(palette);
 
-    // Connect signals and slots
-    connect(ui->N0, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N1, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N2, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N3, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N4, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N5, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N6, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N7, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N8, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
-    connect(ui->N9, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
+    // Create a QList called buttons and add buttons N0 to N9 to it
+    QList<QPushButton*> buttons = {ui->N0, ui->N1, ui->N2, ui->N3, ui->N4, ui->N5, ui->N6, ui->N7, ui->N8, ui->N9};
+
+    // Connect all the buttons to the same signal and call the numClickedHandler function
+    for(QPushButton* button : buttons) {
+        connect(button, &QPushButton::clicked, this, &selectAmount::numClickedHandler);
+    }
 
     connect(ui->wipe, &QPushButton::clicked, this, &selectAmount::clearLe);
     connect(ui->backToMs,  &QPushButton::clicked, this, &selectAmount::backToMoneySelect);
@@ -56,7 +53,7 @@ void selectAmount::backToMoneySelect()
 {
     close();
 
-    moneySelect *moneySelectWindow = new moneySelect(webToken);
+    moneySelect *moneySelectWindow = new moneySelect(webToken, cardNumber);
     moneySelectWindow->show();
 }
 

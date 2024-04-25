@@ -8,12 +8,14 @@ router.get("/info",usercontroller.userInfo);
 
 router.get('/user',usercontroller.getAll)
 
-router.get('/:id',usercontroller.getById);
+router.get('/:id',usercontroller.getByiduser);
 
 router.post("/login",usercontroller.userLogin);
 
 router.post("/register",usercontroller.userRegister);
 
 router.put("/avatar", usercontroller.updateAvatar);
+
+router.delete("/deleteuser",usercontroller.deleteuser)
 
 module.exports = router;

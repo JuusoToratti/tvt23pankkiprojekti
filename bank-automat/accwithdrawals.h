@@ -17,7 +17,7 @@ class accWithdrawals : public QWidget
     Q_OBJECT
 
 public:
-    explicit accWithdrawals(QByteArray& token, QWidget *parent = nullptr);
+    explicit accWithdrawals(QByteArray& token, QString cardNumber, QWidget *parent = nullptr);
     ~accWithdrawals();
 
     // Public member function transTableWidget
@@ -31,6 +31,7 @@ private:
     QByteArray deleteResponse_data;
 
     QByteArray webToken;
+    QString cardNumber;
 
 private slots:
     void handleBack();

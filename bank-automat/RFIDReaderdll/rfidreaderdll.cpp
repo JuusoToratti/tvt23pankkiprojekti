@@ -6,7 +6,7 @@
 RFIDReaderdll::RFIDReaderdll(QObject *parent)
     : QObject(parent)
 {
-    // Etsi RFID-lukija COM5-portista
+    // Find RFID-reader from COM5-port
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
         if (info.portName() == "COM5") {
             m_serial.setPort(info);
@@ -24,12 +24,12 @@ RFIDReaderdll::RFIDReaderdll(QObject *parent)
 
 void RFIDReaderdll::readRFID()
 {
-    //Ladataan tiedot sarjaportista ja tallennetaan data-olioon
-    //QByteArray on dynaamisesti muuttuva tavupuskuri, sen koko voi vaihtua
+    // Loading data from the serial port and storing it in a data object.
+    // QByteArray is a dynamically resizable byte buffer; its size can change
     QByteArray data = m_serial.readAll();
-    //"data" muunnetaan QString muotoon käyttäen Latin-1-merkistöä
-    //trimmed-metodi poistaa tarpeettomat välilyönnit ja rivinvaihdot
+    //The "data" is converted to a QString using the Latin-1 character set.
+    //The "trimmed" method removes unnecessary spaces and line breaks
     QString cardID = QString::fromLatin1(data).trimmed();
-    //Lähetetään signaali
+    //Send the signal
     emit cardDetected(cardID);
 }

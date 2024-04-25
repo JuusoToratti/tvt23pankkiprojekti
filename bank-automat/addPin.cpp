@@ -9,7 +9,7 @@
 #include <QCloseEvent>
 #include <QtSql>
 
-addPin::addPin(QString cardNumber,QWidget *parent)
+addPin::addPin(QString cardNumber, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::addPin)
     , cardNumber(cardNumber)
@@ -94,7 +94,7 @@ void addPin::handlePinInsert()
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     loginManager = new QNetworkAccessManager(this);
-    connect(loginManager, SIGNAL(finished (QNetworkReply*)), this, SLOT(loginSlot(QNetworkReply*)));
+    connect(loginManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(loginSlot(QNetworkReply*)));
 
     loginReply = loginManager->post(request, QJsonDocument(jsonObj).toJson());
 }
@@ -102,6 +102,7 @@ void addPin::handlePinInsert()
 void addPin::loginSlot(QNetworkReply *loginReply)
 {
     loginResponse_data = loginReply->readAll();
+    // The value of webToken is set here
     webToken = loginResponse_data;
     QMessageBox msgBox;
 
@@ -162,16 +163,22 @@ void addPin::getNamesSlot(QNetworkReply *preply)
     QString cName;
     foreach (const QJsonValue &value, json_array) {
         QJsonObject json_obj = value.toObject();
-        //if (json_obj["iduser"].toInt() == 2) { // Tarkistetaan iduserin arvo
+
+        if (cardNumber == "-0600062093") {
             QString fname = json_obj["fname"].toString();
             QString lname = json_obj["lname"].toString();
             cName = "Hei " + fname + " " + lname + "!";
-            break; // Keskeytetään silmukka, kun haluttu käyttäjä löytyy
-       // }
+            break; // The loop is terminated once the desired user is found
+        } else if (cardNumber == "-06000621FE")
+        {
+            QString fname = json_obj["fname"].toString();
+            QString lname = json_obj["lname"].toString();
+            cName = "Hei " + fname + " " + lname + "!";
+        }
     }
 
     // Create a new window and user interface object
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken, cardNumber);
 
     QLabel *customerName = mainUserInterfaceWindow->findChild<QLabel*>("customerName");
     if (customerName) {
