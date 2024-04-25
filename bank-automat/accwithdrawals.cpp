@@ -20,7 +20,10 @@ accWithdrawals::accWithdrawals(QByteArray& token, QString cardNumber, QWidget *p
     deleteManager = new QNetworkAccessManager(this);
 
     connect(ui->withBackButton, &QPushButton::clicked, this, &accWithdrawals::handleBack);
-    connect(ui->deleteActionsButton, &QPushButton::clicked, this, &accWithdrawals::deleteResource);
+
+    // For testing purposes
+    // Clears all account withdrawals from every account
+    // connect(ui->deleteActionsButton, &QPushButton::clicked, this, &accWithdrawals::deleteResource);
 
     // Set the transTableWidget to a new QStandardItemModel object
     transTableWidget(new QStandardItemModel(this));
@@ -44,6 +47,9 @@ void accWithdrawals::handleBack()
     this->close();
 }
 
+// The following function is for testing purposes
+
+/*
 void accWithdrawals::deleteResource()
 {
     // Create DELETE-request
@@ -76,4 +82,4 @@ void accWithdrawals::deleteResource()
         // Release resources
         deleteReply->deleteLater();
     });
-}
+}*/

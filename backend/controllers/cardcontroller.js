@@ -1,9 +1,10 @@
+
+// Tarvittavien moduulien lataus
 const card = require("../models/cardmodel");
 const account = require("../models/accountmodel");
 const bcrypt = require("bcrypt");
-//const { json } = require("express/lib/response");
-//const jwt = require("../config/jwtAuth");//pois päältä väliaikaisesti
 
+// Funktio hakee kaikki kortit tietokannasta
 const getAll = (req, res) => {
     card.get(function(err,dbResult){
         if(err){
@@ -13,7 +14,7 @@ const getAll = (req, res) => {
         }
     });
 }
-
+// Funktio hakee kortin numeron ja PIN-koodin tietokannasta tietyn kortin id:n perusteella
 const getcardnumberpin = (req, res) => {
     card.getcardnumberpin(function(err,dbResult){
         if(err){
@@ -23,9 +24,10 @@ const getcardnumberpin = (req, res) => {
         }
     });
 }
-
+// Funktio lisää uuden kortin tietokantaan
 const addCard = (req, res) => {
     //if(req.body.pin && req.body.card_number && req.body.card_type){
+// Tarkistetaan pyynnön tiedot ennen lisäämistä        
 if(1==1)
 {
     
@@ -45,7 +47,7 @@ if(1==1)
 
 
 
-const getByCardNumber = (req, res) => {
+const getByCardNumber = (req, res) => { //kortti haku numeron perusteella ei tullut käyttöön
 
     if(req.params.card_number){
         card.getByiduser(req.iduser, (err, dbResult) =>{
@@ -82,7 +84,7 @@ const getByCardNumber = (req, res) => {
     }
 }
 
-const getByiduser = (req, res) => {
+const getByiduser = (req, res) => { //korttien haku käyttäjän perusteella ei tullut käyttöön
     card.getByiduser(req.iduser, function(err,dbResult){
 
         if(err){
@@ -98,7 +100,7 @@ const getByiduser = (req, res) => {
     });
 }
 
-const getCardAccountInfo = (req, res) => {
+const getCardAccountInfo = (req, res) => { //kortin tilin tiedot ei tullut käyttöön
     card.getCardAccountInfo(req.iduser, function(err, dbResult){
         if(err){
             return res.json({status:"error",message:err});
@@ -111,7 +113,7 @@ const getCardAccountInfo = (req, res) => {
     });
 }
 
-const getCardAccountInfoByNumber = (req, res) => {
+const getCardAccountInfoByNumber = (req, res) => { //kortin tilin tiedot numeron perusteella haku
     if(req.params.card_number){
         card.getByiduser(req.iduser, (err, dbResult) =>{
 
@@ -145,7 +147,7 @@ const getCardAccountInfoByNumber = (req, res) => {
     }
 }
 
-const unlock = (req, res) => {
+const unlock = (req, res) => { //kortin lukituksen avaus ei tullut käyttöön
     if(req.body.card_number){
 
         card.getByiduser(req.iduser, (err, dbResult) =>{
@@ -203,7 +205,7 @@ const unlock = (req, res) => {
 }
 
 
-const addCardToAccount = (req, res) => {
+const addCardToAccount = (req, res) => { //vanha kortin lisäys tiliin ei tullut käyttöön
     if(req.userId && req.body.accountId && req.body.card_type && req.body.pin){
         const pinRegex = /\D/;
         const pinInput = req.body.pin.toString();
@@ -228,7 +230,7 @@ const addCardToAccount = (req, res) => {
             }else{
                 let hasAccessToAccount = false;
                 for(let i=0;i<dbResult.length;i++){
-                    if(dbResult[i].account_ID === req.body.accountId){
+                    if(dbResult[i].account_ID === req.body.idaccount){
                         hasAccessToAccount = true;
                     }
                 }
@@ -253,7 +255,7 @@ const addCardToAccount = (req, res) => {
 }
 
 
-const disconnectCard = (req, res) => {
+const disconnectCard = (req, res) => { //vanha kortin deletointi ei tullut käyttöön
     if(req.body.card_number){
         card.getByiduser(req.iduser, function(err, dbResult){
             if(err){
@@ -284,7 +286,7 @@ const disconnectCard = (req, res) => {
     }
 }
 
-const getTries = (req, res) => {
+const getTries = (req, res) => { // yritysten ohjain ei tullut käyttöön
     if(req.params.card_number){
         card.getTries(req.params.card_number, function(err, dbResult){
             if(dbResult.length > 0){
@@ -298,7 +300,7 @@ const getTries = (req, res) => {
     }
 }
 
-const authenticate = (req, res) => {
+const authenticate = (req, res) => { //kortin avaus ja yritysten resetointi 
 
     let iduser = null;
 
@@ -322,7 +324,7 @@ const authenticate = (req, res) => {
                     }
 
                     if(match){
-                       // const token = jwt.generateToken(iduser);//pois päältä väliaikaisesti
+                    
                         console.log("Created token:",token);
                         card.updateTries(0, req.body.card_number, (err, dbResult) =>{
                             if(err){
@@ -385,7 +387,7 @@ const authenticate = (req, res) => {
     
 }
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res) => { // kortin deletointi
     if(req.body.idcard){
         card.delete(req.body.idcard,function(err, dbResult){
             if (err) {
@@ -398,7 +400,7 @@ const deleteCard = (req, res) => {
     }
 };
 
-
+//vienti
 module.exports = {
     getAll,
     getcardnumberpin,

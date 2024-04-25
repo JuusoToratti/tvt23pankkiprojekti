@@ -41,10 +41,10 @@ moneySelect::moneySelect(QByteArray& token,QString cardNumber, QWidget *parent)
     connect(ui->hundredEuro, &QPushButton::clicked, this, &moneySelect::hundredEuroClickedGetCredit);
 
     // For testing purposes
-    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPut);
+    /*connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPut);
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPost);
     connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPutCredit);
-    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPostCredit);
+    connect(ui->insertMoney, &QPushButton::clicked, this, &moneySelect::insertHundredClickedPostCredit);*/
 }
 
 moneySelect::~moneySelect()
@@ -72,7 +72,6 @@ void moneySelect::twentyEuroClickedPut()
 {
     // PUT-method
 
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -123,7 +122,6 @@ void moneySelect::put20Slot(QNetworkReply *putReply)
 
 void moneySelect::twentyEuroClickedGet()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         qDebug() << "Kortin numero ei ole sallittu.";
         return;
@@ -206,7 +204,7 @@ void moneySelect::post20Slot(QNetworkReply *postReply)
 void moneySelect::twentyEuroClickedPutCredit()
 {
     // PUT-method
-    // Tarkistetaan kortin numero
+
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -257,7 +255,6 @@ void moneySelect::put20SlotCredit(QNetworkReply *putReplyCredit)
 
 void moneySelect::twentyEuroClickedGetCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         qDebug() << "Kortin numero ei ole sallittu.";
         return;
@@ -339,7 +336,6 @@ void moneySelect::post20SlotCredit(QNetworkReply *postReplyCredit)
 
 void moneySelect::fortyEuroClickedPut()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -384,7 +380,6 @@ void moneySelect::put40Slot(QNetworkReply *PutReply)
 
 void moneySelect::fortyEuroClickedGet()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -460,7 +455,7 @@ void moneySelect::post40Slot(QNetworkReply *postReply)
 void moneySelect::fortyEuroClickedPutCredit()
 {
     // PUT-method
-    // Tarkistetaan kortin numero
+
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -511,7 +506,6 @@ void moneySelect::put40SlotCredit(QNetworkReply *putReplyCredit)
 
 void moneySelect::fortyEuroClickedGetCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         qDebug() << "Kortin numero ei ole sallittu.";
         return;
@@ -594,7 +588,6 @@ void moneySelect::post40SlotCredit(QNetworkReply *postReplyCredit)
 
 void moneySelect::fiftyEuroClickedPut()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -639,7 +632,6 @@ void moneySelect::put50Slot(QNetworkReply *putReply)
 
 void moneySelect::fiftyEuroClickedGet()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -715,7 +707,7 @@ void moneySelect::post50Slot(QNetworkReply *postReply)
 void moneySelect::fiftyEuroClickedPutCredit()
 {
     // PUT-method
-    // Tarkistetaan kortin numero
+
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -766,7 +758,6 @@ void moneySelect::put50SlotCredit(QNetworkReply *putReplyCredit)
 
 void moneySelect::fiftyEuroClickedGetCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         qDebug() << "Kortin numero ei ole sallittu.";
         return;
@@ -848,7 +839,6 @@ void moneySelect::post50SlotCredit(QNetworkReply *postReplyCredit)
 
 void moneySelect::hundredEuroClickedPut()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -893,7 +883,6 @@ void moneySelect::put100Slot(QNetworkReply *putReply)
 
 void moneySelect::hundredEuroClickedGet()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -969,7 +958,7 @@ void moneySelect::post100Slot(QNetworkReply *postReply)
 void moneySelect::hundredEuroClickedPutCredit()
 {
     // PUT-method
-    // Tarkistetaan kortin numero
+
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -1020,7 +1009,6 @@ void moneySelect::put100SlotCredit(QNetworkReply *putReplyCredit)
 
 void moneySelect::hundredEuroClickedGetCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         qDebug() << "Kortin numero ei ole sallittu.";
         return;
@@ -1103,10 +1091,9 @@ void moneySelect::post100SlotCredit(QNetworkReply *postReplyCredit)
 
 // The following functions are for testing purposes
 
-
+/*
 void moneySelect::insertHundredClickedPut()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -1140,7 +1127,6 @@ void moneySelect::putInsertedMoneySlot(QNetworkReply *putReply)
 
 void moneySelect::insertHundredClickedPost()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -1178,7 +1164,6 @@ void moneySelect::postInsertedMoneySlot(QNetworkReply *postReply)
 
 void moneySelect::insertHundredClickedPutCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -1212,7 +1197,6 @@ void moneySelect::putInsertedMoneySlotCredit(QNetworkReply *putReplyCredit)
 
 void moneySelect::insertHundredClickedPostCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -1246,4 +1230,4 @@ void moneySelect::postInsertedMoneySlotCredit(QNetworkReply *postReplyCredit)
     qDebug()<<postResponse_dataCredit;
     postReplyCredit->deleteLater();
     postManagerCredit->deleteLater();
-}
+}*/

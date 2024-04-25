@@ -35,7 +35,9 @@ private:
 
 private slots:
     void handleBack();
-    void deleteResource();
+
+   // For testing purposes
+   // void deleteResource();
 };
 
 #endif // ACCWITHDRAWALS_H

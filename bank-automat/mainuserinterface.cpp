@@ -130,7 +130,7 @@ void mainUserInterface::transactionsCreditNetworkReqFin(QNetworkReply *creditRep
     if (cardNumber !="-06000621FE") {
         creditReply->deleteLater();
         getCreditManager->deleteLater();
-        return; // Älä jatka, jos data on tyhjä tai null
+        return;
     }
     qDebug() << "" << transCreditResponse_data;
 
