@@ -14,12 +14,15 @@
 #include <QNetworkAccessManager>
 #include <QJsonDocument>
 
-mainUserInterface::mainUserInterface(QByteArray& token, QWidget *parent)
+mainUserInterface::mainUserInterface(QByteArray& token, QString cardNumber, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::mainUserInterface)
     , webToken(token)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
+
+    this->setAttribute(Qt::WA_DeleteOnClose); // Aseta WA_DeleteOnClose -ominaisuus
 
     QPalette palette;
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
@@ -28,7 +31,9 @@ mainUserInterface::mainUserInterface(QByteArray& token, QWidget *parent)
     connect(ui->logOut, &QPushButton::clicked, this, &mainUserInterface::logoutClicked);
     connect(ui->withdrawMoney, &QPushButton::clicked, this, &mainUserInterface::withdrawMoneyClicked);
     connect(ui->showTransactions, &QPushButton::clicked, this, &mainUserInterface::handleTransactionsClicked);
-    connect(ui->showBalance, &QPushButton::clicked, this , &mainUserInterface::getCreditBalanceSlot);
+    connect(ui->showTransactions, &QPushButton::clicked, this, &mainUserInterface::handleCreditTransactionsClicked);
+    connect(ui->showBalance, &QPushButton::clicked, this , &mainUserInterface::getDebitBalance);
+    connect(ui->showBalance, &QPushButton::clicked, this , &mainUserInterface::getCreditBalance);
 }
 
 mainUserInterface::~mainUserInterface()
@@ -39,7 +44,7 @@ mainUserInterface::~mainUserInterface()
 void mainUserInterface::withdrawMoneyClicked()
 {
     // Create and show moneySelect-object
-    moneySelect *moneySelectWindow = new moneySelect(webToken);
+    moneySelect *moneySelectWindow = new moneySelect(webToken, cardNumber);
     moneySelectWindow->show();
 
     // Close mainUserInterface-window
@@ -64,24 +69,25 @@ void mainUserInterface::handleTransactionsClicked()
 
 void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
 {
-    //Account transactions
+    // Debit transactions
 
     QByteArray transResponse_data=reply->readAll();
+    if (cardNumber != "-0600062093") {
+        reply->deleteLater();
+        getManager->deleteLater();
+        return;
+    }
+    qDebug() << "" << transResponse_data;
+
     QJsonDocument json_doc = QJsonDocument::fromJson(transResponse_data);
     QJsonArray json_array = json_doc.array();
 
     QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),2);
-    //table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Tilinumero"));
-    //table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Noston numero"));
     table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Määrä"));
     table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Päiväys"));
 
     for (int row = 0; row < json_array.size(); ++row) {
-        QJsonObject json_obj = json_array[row].toObject(); // Määritellään json_obj tässä
-       // QStandardItem *idaccount = new QStandardItem(QString::number(json_obj["idaccount"].toInt()));
-       // table_model->setItem(row, 0, idaccount);
-       // QStandardItem *transactions = new QStandardItem(json_obj["transactions"].toString());
-        //table_model->setItem(row, 1, transactions);
+        QJsonObject json_obj = json_array[row].toObject();
         QStandardItem *amount = new QStandardItem(json_obj["amount"].toString());
         table_model->setItem(row, 0, amount);
         QStandardItem *date = new QStandardItem(json_obj["date"].toString());
@@ -89,7 +95,7 @@ void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
     }
 
     // Find the accwithdrawals window and set the model to its transTableWidget
-    accWithdrawals *accWithdrawalsWindow = new accWithdrawals(webToken);
+    accWithdrawals *accWithdrawalsWindow = new accWithdrawals(webToken, cardNumber);
     accWithdrawalsWindow->transTableWidget(table_model);
     accWithdrawalsWindow->show();
 
@@ -100,8 +106,64 @@ void mainUserInterface::transactionsNetworkReqFin(QNetworkReply *reply)
     getManager->deleteLater();
 }
 
-void mainUserInterface::getCreditBalanceSlot()
+void mainUserInterface::handleCreditTransactionsClicked()
 {
+    QString site_url="http://localhost:3000/accountinformation/infocredit";
+    QNetworkRequest request((site_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    request.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
+    getCreditManager = new QNetworkAccessManager(this);
+    connect(getCreditManager, SIGNAL(finished(QNetworkReply*)),this, SLOT(transactionsCreditNetworkReqFin(QNetworkReply*)));
+    creditReply = getCreditManager->get(request);
+}
+
+void mainUserInterface::transactionsCreditNetworkReqFin(QNetworkReply *creditReply)
+{
+    //Credit transactions
+
+    QByteArray transCreditResponse_data=creditReply->readAll();
+    if (cardNumber !="-06000621FE") {
+        creditReply->deleteLater();
+        getCreditManager->deleteLater();
+        return; // Älä jatka, jos data on tyhjä tai null
+    }
+    qDebug() << "" << transCreditResponse_data;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(transCreditResponse_data);
+    QJsonArray json_array = json_doc.array();
+
+    QStandardItemModel *table_model = new QStandardItemModel(json_array.size(),2);
+    table_model->setHeaderData(0, Qt::Horizontal, QObject::tr("Määrä"));
+    table_model->setHeaderData(1, Qt::Horizontal, QObject::tr("Päiväys"));
+
+    for (int row = 0; row < json_array.size(); ++row) {
+        QJsonObject json_obj = json_array[row].toObject();
+        QStandardItem *amount = new QStandardItem(json_obj["amount"].toString());
+        table_model->setItem(row, 0, amount);
+        QStandardItem *date = new QStandardItem(json_obj["date"].toString());
+        table_model->setItem(row, 1, date);
+    }
+
+    // Find the accwithdrawals window and set the model to its transTableWidget
+    accWithdrawals *accWithdrawalsWindow = new accWithdrawals(webToken, cardNumber);
+    accWithdrawalsWindow->transTableWidget(table_model);
+    accWithdrawalsWindow->show();
+
+    // Close mainUserInterface-window
+    this->close();
+
+    creditReply->deleteLater();
+    getCreditManager->deleteLater();
+}
+
+void mainUserInterface::getDebitBalance()
+{
+    qDebug() << "Card number: " << cardNumber;
     //If the URL changes on the REST API side, then there should also be a corresponding change here
     QString site_url="http://localhost:3000/accounts/getaccountbalance/1";
     QNetworkRequest request((site_url));
@@ -112,39 +174,101 @@ void mainUserInterface::getCreditBalanceSlot()
     //WEBTOKEN END
 
     pgetManager = new QNetworkAccessManager(this);
-    connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetworkRequestFinished(QNetworkReply*)));
+    connect(pgetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(debitRequestFinished(QNetworkReply*)));
     preply = pgetManager->get(request);
 }
 
-void mainUserInterface::onNetworkRequestFinished(QNetworkReply *preply)
+void mainUserInterface::debitRequestFinished(QNetworkReply *preply)
 {
-    //Debit balance
+    // Debit balance
+    qDebug() << "Card number in debitRequestFinished(): " << cardNumber;
 
     QByteArray response_data=preply->readAll();
+    if (cardNumber == "-06000621FE") {
+        preply->deleteLater();
+        pgetManager->deleteLater();
+    } else {
+   // QString cleaned_response_data = QString::fromUtf8(response_data);
+   // qDebug()<<"DATA : "+cleaned_response_data;
     qDebug()<<"DATA : "+response_data;
 
     QJsonDocument json_doc = QJsonDocument::fromJson(response_data);
+
+    //QJsonDocument json_doc = QJsonDocument::fromJson(cleaned_response_data.toUtf8());
 
     if (json_doc.isObject()) {
         QJsonObject json_obj = json_doc.object();
         QString account_balance = json_obj.value("account_balance").toString();
         qDebug() << "Current account balance: " << account_balance;
 
-    // Create a new window and a user interface object
-    accountBalance *accountBalanceWindow = new accountBalance(webToken);
+        // Create a new window and a user interface object
+        accountBalance *accountBalanceWindow = new accountBalance(webToken, cardNumber);
 
-    QLabel *creditLabel = accountBalanceWindow->findChild<QLabel*>("creditLabel");
-    if (creditLabel) {
-        creditLabel->setText(account_balance);
+        QLabel *debitLabel = accountBalanceWindow->findChild<QLabel*>("debitlabel");
+        if (debitLabel) {
+            debitLabel->setText(account_balance);
+        }
+        accountBalanceWindow->show();
+
+        // Close the current window
+        this->close();
+
+        preply->deleteLater();
+        pgetManager->deleteLater();
     }
-    accountBalanceWindow->show();
-
-    // Close the current window
-    this->close();
-
-    preply->deleteLater();
-    pgetManager->deleteLater();
  }
+}
+
+void mainUserInterface::getCreditBalance()
+{
+    //If the URL changes on the REST API side, then there should also be a corresponding change here
+    QString Creditsite_url="http://localhost:3000/accounts/getcreditlimit/4";
+    QNetworkRequest Creditrequest((Creditsite_url));
+
+    //WEBTOKEN START
+    QByteArray myToken="Bearer "+webToken;
+    Creditrequest.setRawHeader(QByteArray("Authorization"),(myToken));
+    //WEBTOKEN END
+
+    pgetCreditManager = new QNetworkAccessManager(this);
+    connect(pgetCreditManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(creditRequestFinished(QNetworkReply*)));
+    pCreditreply = pgetCreditManager->get(Creditrequest);
+}
+
+void mainUserInterface::creditRequestFinished(QNetworkReply *pCreditreply)
+{
+    // Credit balance
+
+    QByteArray creditResponse_data=pCreditreply->readAll();
+    if (cardNumber == "-0600062093") {
+        pCreditreply->deleteLater();
+        pgetCreditManager->deleteLater();
+    } else {
+    qDebug()<<"DATA : "+creditResponse_data;
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(creditResponse_data);
+
+    if (json_doc.isObject()) {
+        QJsonObject json_obj = json_doc.object();
+        QString credit_limit = json_obj.value("credit_limit").toString();
+        qDebug() << "Current credit limit: " << credit_limit;
+
+        // Create a new window and a user interface object
+        accountBalance *accountBalanceWindow = new accountBalance(webToken, cardNumber);
+
+        QLabel *creditLabel = accountBalanceWindow->findChild<QLabel*>("creditLabel");
+        if (creditLabel) {
+            creditLabel->setText(credit_limit);
+        }
+        accountBalanceWindow->show();
+
+        // Close the current window
+        this->close();
+
+        pCreditreply->deleteLater();
+        pgetCreditManager->deleteLater();
+    }
+}
 }
 
 void mainUserInterface::logoutClicked()

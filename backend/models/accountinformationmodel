@@ -1,0 +1,35 @@
+const db = require("../config/db.js");
+
+const accountinformation = {
+    get: function(callback){
+        return db.query("SELECT idaccount,transactions,amount,date FROM account_information where idaccount = 1;", callback);
+    },
+    getcredit: function(callback){
+        return db.query("SELECT idaccount,transactions,amount,date FROM account_information where idaccount = 4;", callback);
+    },
+    getMaxaccountinformationNum: function(card_number, callback){
+        return db.query("SELECT COUNT(accountinformation_ID) AS maxCount FROM accountinformation WHERE idaccount = (SELECT card.idaccount FROM card WHERE card_number = ?)", [card_number], callback);
+    },
+    getByCardNumberFixed: function(card_number, callback){
+        return db.query("SELECT * FROM accountinformation WHERE idaccount = (SELECT card.idaccount FROM card WHERE card_number = ?) ORDER BY log_ID DESC LIMIT 10", [card_number], callback);
+    },
+    getByCardNumber: function(card_number, x, callback){
+        return db.query("SELECT * FROM accountinformation WHERE idaccount = (SELECT card.idaccount FROM card WHERE card_number = ?) ORDER BY log_ID DESC LIMIT ?, 10", [card_number, x], callback);
+    },
+    add: function(newaccountinformation, callback){
+        console.log("model");
+        return db.query("INSERT INTO account_information (date, transactions, amount, idaccount,idaccount_information) VALUES(?,?,?,?,?) ",
+        [newaccountinformation.date,newaccountinformation.transactions, newaccountinformation.amount, newaccountinformation.idaccount, newaccountinformation.idaccount_information], callback);
+    },
+    add: function(newaccountinformation, callback){
+        console.log("model");
+        return db.query("INSERT INTO account_information (date, transactions, amount, idaccount,idaccount_information) VALUES(?,?,?,?,?) ",
+        [newaccountinformation.date,newaccountinformation.transactions, newaccountinformation.amount, newaccountinformation.idaccount, newaccountinformation.idaccount_information], callback);
+    },
+    delete: function( callback){
+        return db.query("DELETE FROM account_information ", callback);
+    }
+
+}
+
+module.exports = accountinformation;

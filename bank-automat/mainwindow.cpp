@@ -57,6 +57,7 @@ void MainWindow::handleCardDetected(QString cardID)
 
         cardNumber = cardID;
         qDebug() << "Debit-kortti";
+        // Debit PIN is 1234
         addPin *addPinWindow = new addPin(cardNumber);
         this->close();
         addPinWindow->show();
@@ -65,7 +66,7 @@ void MainWindow::handleCardDetected(QString cardID)
 
         cardNumber = cardID;
         qDebug() << "Credit-kortti ";
-        ui->begin->setText("Credit-kortti");
+        // Credit PIN is 5678
         addPin *addPinWindow = new addPin(cardNumber);
         this->close();
         addPinWindow->show();

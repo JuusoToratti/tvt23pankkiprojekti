@@ -6,6 +6,7 @@ const user = {
     get: function(callback){
         return db.query("SELECT * FROM user", callback);
     },
+    
     getById: function(id, callback){
         return db.query("SELECT * FROM user WHERE iduser = ?", [id], callback);
     },
@@ -23,11 +24,18 @@ const user = {
             [newuser.email, hash, newuser.fname, newuser.lname, newuser.adress, newuser.phonenumber,newuser.picture,newuser.username, newuser.iduser], callback);
         });
     },
-    updateAvatar: function(iduser, file, callback){
-        return db.query("UPDATE user SET picture = ? WHERE iduser = ?",
-        [file, iduser], callback);
-    }
+    deleteuser: function(iduser, callback){
+        return db.query("DELETE FROM user WHERE iduser = ?", [iduser], callback);
+    },
+
+updateAvatar: function(iduser, file, callback){
+    return db.query("UPDATE user SET picture = ? WHERE iduser = ?",
+    [file, iduser], callback);
+}
 
 }
+
+
+
 
 module.exports = user;

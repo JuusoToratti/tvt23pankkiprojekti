@@ -10,7 +10,15 @@ const getAll = (req, res) => {
         }
     });
 }
-
+const getcredit = (req, res) => {
+    accountinformation.getcredit(function(err,dbResult){
+        if(err){
+            res.json(err);
+        }else{
+            res.json(dbResult);
+        }
+    });
+}
 const getByCardNumber = (req, res) => {
 
     if(!req.params.card_number || !req.params.page){
@@ -108,88 +116,57 @@ const getByCardNumberFixed = (req, res) => {
 }
 
 const add = (req, res) => {
-
-    card.getByiduser(req.iduser, function(err,dbResult){
-
-        let hasAccessToCard = false;
-
-        for(let i = 0; i < dbResult.length; i++){
-
-            if(dbResult[i].card_number === req.body.card_number){
-                hasAccessToCard = true;
-            }
-        }
-
-        if(!hasAccessToCard){
-            return res.json({status:"error",message:"User doesn't have access to this card"});
-        }
-
-        if(req.body.amount && req.body.card_number){
-            let event = null;
-    
-            if(req.body.amount < 0){
-                event = "Otto";
+    if(1==1)
+    {
+        accountinformation.add(req.body,function(err, dbResult){
+            if(err){
+                    //return res.json(err);
+                    res.send(err);        
             }else{
-                event = "Talletus";
+                return res.json({status:"success",message:"New information added succesfully!"});
             }
-    
-            accountinformation.add(req, event, function(err, dbResult){
-                if(err){
-                    console.log(err);
-                    return res.json({status:"error",message:"Error on creating information."});
-                }
-    
-                if(dbResult.affectedRows > 0){
-                    res.json({status:"success",message:"information created."});
-                }else{
-                    res.json({status:"error",message:"information was not created."});
-                }
-            });
-        }else{
-            res.json({message:"Please fill all fields."});
-        }
-    })
+        });
+    }else{
+        return res.json({status:"error",message:"Please fill all fields."});
+    }
 }
-
+const addcredit = (req, res) => {
+    if(1==1)
+    {
+        accountinformation.add(req.body,function(err, dbResult){
+            if(err){
+                    //return res.json(err);
+                    res.send(err);        
+            }else{
+                return res.json({status:"success",message:"New information added succesfully!"});
+            }
+        });
+    }else{
+        return res.json({status:"error",message:"Please fill all fields."});
+    }
+}
 const deleteaccoutinformation = (req, res) => {
 
-    card.getByiduser(req.iduser, function(err,dbResult){
-
-        let hasAccessToCard = false;
-
-        for(let i = 0; i < dbResult.length; i++){
-
-            if(dbResult[i].card_number === req.params.card_number){
-                hasAccessToCard = true;
+        accountinformation.delete(function(err, dbResult){
+            if (err) {
+                console.error("Virhe poistettaessa tilitietoja:", err);
+                return res.status(500).json({ error: 'Virhe poistettaessa tilitietoja' });
             }
-        }
-
-        if(!hasAccessToCard){
-            return res.json({status:"error",message:"User doesn't have access to this card"});
-        }
-        
-        if(req.body.card_number && req.body.accountinformation_ID){
-            accountinformation.delete(req, function(err, dbResult){
-                if(err){
-                    return res.json({status:"error",message:"Error on deleting information."});
-                }
+            console.log("Tilitieto poistettiin onnistuneesti.");
+            return res.status(200).json({ message: 'Tilitieto poistettiin onnistuneesti' });
+        });
     
-                if(dbResult.affectedRows > 0){
-                    res.json({status:"success",message:"information deleted."});
-                }else{
-                    res.json({status:"error",message:"information not deleted."});
-                }
-            });
-        }else{
-            res.json({status:"error",message:"Please fill all fields."});
-        }
-    })
-}
+};
+
+   
+
 
 module.exports = {
     getAll,
+    getcredit,
     getByCardNumber,
     getByCardNumberFixed,
     add,
+    addcredit,
     deleteaccoutinformation
 }

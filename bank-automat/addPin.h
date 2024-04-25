@@ -40,8 +40,6 @@ private:
     QNetworkReply *loginReply;
     QByteArray loginResponse_data;
 
-    QString cardNumber;
-
     // Reset the incorrect PIN attempts counter
     int wrongPinAttempts = 0;
 
@@ -49,6 +47,8 @@ private:
     const int maxWrongAttempts = 3;
 
     QByteArray webToken;
+
+    QString cardNumber;
 
 private slots:
     void handlePinInsert();

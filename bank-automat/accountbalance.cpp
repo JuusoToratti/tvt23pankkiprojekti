@@ -5,10 +5,11 @@
 #include <QCloseEvent>
 #include "mainuserinterface.h"
 
-accountBalance::accountBalance(QByteArray& token, QWidget *parent)
+accountBalance::accountBalance(QByteArray& token, QString cardNumber,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::accountBalance)
     , webToken(token)
+    , cardNumber(cardNumber)
 {
     ui->setupUi(this);
 
@@ -27,7 +28,7 @@ accountBalance::~accountBalance()
 
 void accountBalance::handleBackClicked()
 {
-    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken);
+    mainUserInterface *mainUserInterfaceWindow = new mainUserInterface(webToken, cardNumber);
     mainUserInterfaceWindow->show();
 
     this->close();

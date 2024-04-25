@@ -4,6 +4,7 @@ const { json } = require("express/lib/response");
 const account = require("../models/accountmodel");
 const user = require("../models/usermodel");
 const card = require("../models/cardmodel");
+const res = require("express/lib/response");
 
 const getAll = (req, res) => {
     account.get(function(err, dbResult){
@@ -15,17 +16,59 @@ const getAll = (req, res) => {
     });
 }
 
-const getById = (req, res) => {
-    account.getById(req.params.id,function(err, dbResult){
+const getaccountbalance = (req, res) => {
+    if(req.params.id)
+    
+    account.getaccountbalance(req.params.id,function(err, dbResult){
         if(err){
             return res.json(err);
-        }else{
-            return res.json(dbResult);
+        } else {
+            return res.json(dbResult[0]);
         }
     });
 }
+const getcreditlimit = (req, res) => {
+    if(req.params.id)
+    
+    account.getcreditlimit(req.params.id,function(err, dbResult){
+        if(err){
+            return res.json(err);
+        } else {
+            return res.json(dbResult[0]);
+        }
+    });
+}
+const updateBalance = (req, res) => {
+    if(req.body.account_balance){
 
-const getOwnedAccounts = (req, res) => {
+        account.updateBalance(req.body.account_balance, (err, dbResult) => {
+            if(err){
+                return res.json({status:"error", message:err});
+            } else {
+                console.log(dbResult);
+                return res.json(dbResult);
+            }
+        });
+    } else {
+        return res.json({status:"error", message:"account_balance missing from request"});
+    }
+}
+const updatecredit = (req, res) => {
+    if(req.body.credit_limit){
+        account.updatecredit(req.body.credit_limit, (err, dbResult) => {
+            if(err){
+                return res.json({status:"error", message:err});
+            } else {
+                console.log(dbResult);
+                return res.json(dbResult);
+            }
+        });
+    } else {
+        return res.json({status:"error", message:"credit_limit or idaccount missing from request"});
+    }
+}
+
+getOwnedAccounts = (req, res) => {
     account.getByiduser(req,function(err, dbResult){
         if(err){
             return res.json(err);
@@ -101,71 +144,6 @@ const getConnectedUsers = (req, res) => {
     }
 }
 
-const updateBalance = (req, res) => {
-    if(req.body.card_number && req.body.amount && req.body.action && req.body.type){
-        card.getByUserID(req.iduser, (err, dbResult) =>{
-
-            if(err){
-                return res.json({status:"error",message:err});
-            }
-
-            let hasAccessToCard = false;
-        
-            for(let i = 0; i < dbResult.length; i++){
-                if(dbResult[i].card_number === req.body.card_number){
-                    hasAccessToCard = true;
-                }
-            }
-
-            if(!hasAccessToCard){
-                return res.json({status:"error",message:"User doesn't have this card"});
-            }
-
-            account.getByCardNumber(req.body.card_number, function(err, dbResult){
-                if(err){
-                    return res.json({status:"error",message:err});
-                }
-                if(dbResult.length > 0){
-                    let curbalance = dbResult[0].balance;
-                    if(req.body.action === "0" && dbResult[0].card_type === 0 || req.body.action === "0" && dbResult[0].card_type === 1 && req.body.type === "0"){
-                        if(dbResult[0].balance >= req.body.amount){
-                            account.updateBalance(-Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
-                                curbalance += -Math.abs(req.body.amount);
-                                return res.json({status:"success",balance:curbalance});
-                            });
-                        }else{
-                            return res.json({status:"error",message:"Not enough balance."});
-                        }
-                    }else if(req.body.action === "0" && dbResult[0].card_type === 1 || req.body.action === "0" && dbResult[0].card_type === 1 && req.body.type === "1"){
-                        account.updateBalance(-Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
-                            if(err){
-                                return res.json({status:"error",message:err});
-                            }
-                            if(dbResult.affectedRows > 0){
-                                curbalance += -Math.abs(req.body.amount);
-                                return res.json({status:"success",balance:curbalance});
-                            }
-                        });
-                    }else if(req.body.action === "1"){
-                        account.updateBalance(Math.abs(req.body.amount), req.body.card_number, function(err, dbResult){
-                            if(err){
-                                return res.json({status:"error",message:err});
-                            }
-                            if(dbResult.affectedRows > 0){
-                                curbalance += Math.abs(req.body.amount);
-                                return res.json({status:"success",balance:curbalance});
-                            }
-                        });
-                    }else{
-                        return res.json({status:"error",message:"Invalid value for 'action'."});
-                    }
-                }
-            });
-        });
-    }else{
-        return res.json({status:"error",message:"Please fill all fields."});
-    }
-}
 
 const disconnectUser = (req, res) => {
     if(req.body.account && req.body.user){
@@ -199,52 +177,28 @@ const disconnectUser = (req, res) => {
 }
 
 const deleteAccount = (req, res) => {
-    if(req.body.id){
-        account.getOwnerById(req.iduser, req.body.id, function(err, dbResult){
-            if(err){
-                return res.json({status:"error",message:err});
+    if(req.body.idaccount){
+        account.delete(req.idaccount,function(err, dbResult){
+            if (err) {
+                console.error("Virhe poistettaessa tiliä:", err);
+                return res.status(500).json({ error: 'Virhe poistettaessa tiliä' });
             }
-            let hasAccessToAccount = false;
-            let accountId = null;
-            for(let i=0;i<dbResult.length;i++){
-                if(dbResult[i].account_ID === req.body.id && dbResult[i].owner === req.iduser){
-                    hasAccessToAccount = true;
-                    accountId = dbResult[i].account_ID;
-                    if(dbResult[i].balance !== 0){
-                        return res.json({status:"error",message:"Account's balance must be 0 before deleting."});
-                    }
-                }
-            }
-            if(!hasAccessToAccount){
-                return res.json({status:"error",message:"You are not the owner of this account."});
-            }
-            card.disconnectByAccountId(accountId, function(err, dbResult){
-                if(err){
-                    return res.json({status:"error",message:err});
-                }
-            });
-            account.delete(accountId, function(err, dbResult){
-                if(err){
-                    return res.json({status:"error",message:err});
-                }
-                if(dbResult.affectedRows > 0){
-                    return res.json({status:"success",message:"Successfully deleted account "+req.body.id});
-                }
-            });
+            console.log("Tili poistettiin onnistuneesti.");
+            return res.status(200).json({ message: 'Tili poistettiin onnistuneesti' });
         });
-    }else{
-        return res.json({status:"error",message:"Please fill all fields."});
     }
-}
-
+};
 module.exports = {
     getAll,
-    getById,
+    getaccountbalance,
+    getcreditlimit,
+    updateBalance,
+    updatecredit,
     getOwnedAccounts,
     getConnectedUsers,
     addAccount,
     addUserToAccount,
-    updateBalance,
     disconnectUser,
     deleteAccount,
+
 }

@@ -6,6 +6,20 @@ const card = {
     get: function(callback){
         return db.query("SELECT * FROM card", callback);
     },
+    getcardnumberpin: function(callback){
+        return db.query("select card_number, pin FROM card where idcard = 4;", callback);
+    },
+
+    addCard: function(newcard,callback){
+        console.log("model");
+         bcrypt.hash(newcard.pin, saltRounds, function(err, hash){
+            return db.query("INSERT INTO card (pin, card_number, active,idcard,idaccount,user_iduser,cardtype ) VALUES(?,?,?,?,?,?,?)",
+            [hash,newcard.card_number,newcard.active,newcard.idcard,newcard.idaccount,newcard.user_iduser,newcard.cardtype,], callback);
+        });
+    },
+    addCardToAccount: function(user_idcard, idaccount, callback){
+        return db.query("INSERT INTO (user_iduser, idaccount) VALUES(?, ?)", [iduser, idaccount], callback);
+    },
     getByNumber: function(card_number, callback){
         return db.query("SELECT * FROM card WHERE card_number = ?", [card_number], callback);
     },
@@ -26,10 +40,10 @@ const card = {
     updateActiveStatus: function(active, card_number, callback){
         return db.query("UPDATE card SET active = ? WHERE card_number = ?", [active, card_number], callback);
     },
-    connectCard: function(accountId, iduser, card_type, pin, callback){
+    connectCard: function(accountId, userId, card_type, pin, callback){
         bcrypt.hash(pin, saltRounds, function(err, hash){
-            return db.query("UPDATE card SET account_ID = ?, iduser = ?, card_type = ?, pin = ?, active = 1 WHERE iduser IS NULL AND account_ID IS NULL ORDER BY card_ID ASC LIMIT 1",
-            [accountId, iduser, card_type, hash], callback);
+            return db.query("UPDATE card SET account_ID = ?, user_ID = ?, card_type = ?, pin = ?, active = 1 WHERE user_ID IS NULL AND account_ID IS NULL ORDER BY card_ID ASC LIMIT 1",
+            [accountId, userId, card_type, hash], callback);
         });
     },
     disconnectCard: function(card_number, callback){
@@ -40,14 +54,9 @@ const card = {
         return db.query("UPDATE card SET account_ID = NULL, iduser = NULL, card_type = 0, active = 0 WHERE account_ID = ?",
         [accountId], callback);
     },
-    addCard: function(callback){
-        bcrypt.hash("1234", saltRounds, function(err, hash){
-            return db.query("INSERT INTO card (pin, card_number, active) VALUES(?,?, 0)",
-            [hash, Math.floor(Math.random() * 899999999999 + 100000000000)], callback);
-        });
-    },
-    delete: function(req, callback){
-        return db.query("DELETE FROM card WHERE card_number = ?", [req.body.card_number], callback);
+
+    delete: function(idcard, callback){
+        return db.query("DELETE FROM card WHERE idcard = ?", [idcard], callback);
     },
     updateTries: function(tries, card_number, callback){
         return db.query("UPDATE card SET tries = ? WHERE card_number = ?", [tries, card_number], callback);

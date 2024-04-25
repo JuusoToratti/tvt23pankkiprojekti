@@ -1,7 +1,6 @@
 #ifndef RFIDREADERDLL_H
 #define RFIDREADERDLL_H
 
-
 #include "RFIDReaderdll_global.h"
 #include <QObject>
 #include <QSerialPort>

@@ -1,17 +1,21 @@
 var express = require('express');
 var router = express.Router();
 const db = require("../config/db");
-const logsController = require("../controllers/accountinformationcontroller");
+const accountinformationcontroller = require("../controllers/accountinformationcontroller.js");
 //const jwtAuth = require("../config/jwtAuth");//pois väliaikaisesti
 
-router.get("/",jwtAuth.verifyToken,accountinformationcontroller.getAll);
+router.get("/info",accountinformationcontroller.getAll);
 
-router.get("/getByCardNumber/:card_number/:page",jwtAuth.verifyToken,accountinformationcontroller.getByCardNumber)
+router.get("/infocredit",accountinformationcontroller.getcredit);
 
-router.get("/getByCardNumber/:card_number",jwtAuth.verifyToken,accountinformationcontroller.getByCardNumberFixed)
+router.get("/getByCardNumber/:card_number/:page",accountinformationcontroller.getByCardNumber)
 
-router.post("/create",jwtAuth.verifyToken,accountinformationcontroller.add);
+router.get("/getByCardNumber/:card_number",accountinformationcontroller.getByCardNumberFixed)
 
-router.delete("/delete",jwtAuth.verifyToken,accountinformationcontroller.deleteaccountinformation);
+router.post("/create",accountinformationcontroller.add);
+
+router.post("/createcredit",accountinformationcontroller.add)
+
+router.delete("/delete",accountinformationcontroller.deleteaccoutinformation);
 
 module.exports = router;

@@ -14,6 +14,37 @@ const getAll = (req, res) => {
     });
 }
 
+const getcardnumberpin = (req, res) => {
+    card.getcardnumberpin(function(err,dbResult){
+        if(err){
+            return res.json({status:"error",message:err});
+        }else{
+            res.json(dbResult[0]);
+        }
+    });
+}
+
+const addCard = (req, res) => {
+    //if(req.body.pin && req.body.card_number && req.body.card_type){
+if(1==1)
+{
+    
+        card.addCard(req.body,function(err, dbResult){
+            if(err){
+                    //return res.json(err);
+                    res.send(err);        
+            }else{
+                return res.json({status:"success",message:"New card added succesfully!"});
+            }
+        });
+    }else{
+        return res.json({status:"error",message:"Please fill all fields."});
+    }
+}
+
+
+
+
 const getByCardNumber = (req, res) => {
 
     if(req.params.card_number){
@@ -172,21 +203,8 @@ const unlock = (req, res) => {
 }
 
 
-
-const addCard = (req, res) => {
-    if(1==1)
-    card.add(function(err, dbResult){
-        if(err){
-            return res.json({status:"error",message:err});
-        }else{
-            res.json({status:"success",message:"Successfully added new card to database."});
-        }
-    });
-}
-
-
-const connectCard = (req, res) => {
-    if(req.iduser && req.body.accountId && req.body.card_type && req.body.pin){
+const addCardToAccount = (req, res) => {
+    if(req.userId && req.body.accountId && req.body.card_type && req.body.pin){
         const pinRegex = /\D/;
         const pinInput = req.body.pin.toString();
         let validatePin = false;
@@ -204,7 +222,7 @@ const connectCard = (req, res) => {
         }else{
             return res.json({status:"error",message:"Invalid card type."});
         }
-        account.getByiduser(req, function(err, dbResult){
+        account.getByUserId(req, function(err, dbResult){
             if(err){
                 return res.json({status:"error",message:err});
             }else{
@@ -217,7 +235,7 @@ const connectCard = (req, res) => {
                 if(!hasAccessToAccount){
                     return res.json({status:"error",message:"User does not have access to this account."});
                 }
-                card.connectCard(req.body.accountId, req.iduser, ctype, req.body.pin, function(err, dbResult){
+                card.connectCard(req.body.accountId, req.userId, ctype, req.body.pin, function(err, dbResult){
                     if(err){
                         return res.json({status:"error",message:err});
                     }else if(dbResult.affectedRows === 0){
@@ -233,6 +251,7 @@ const connectCard = (req, res) => {
         return res.json({status:"error",message:"Please fill all fields."});
     }
 }
+
 
 const disconnectCard = (req, res) => {
     if(req.body.card_number){
@@ -367,58 +386,31 @@ const authenticate = (req, res) => {
 }
 
 const deleteCard = (req, res) => {
-    if(req.body.card_number){
-
-        
-        card.getByiduser(req.iduser, (err, dbResult) =>{
-
-            if(err){
-                return res.json({status:"error",message:err});
+    if(req.body.idcard){
+        card.delete(req.body.idcard,function(err, dbResult){
+            if (err) {
+                console.error("Virhe poistettaessa kortteja:", err);
+                return res.status(500).json({ error: 'Virhe poistettaessa kortteja' });
             }
-
-            let hasAccessToCard = false;
-        
-            for(let i = 0; i < dbResult.length; i++){
-                if(dbResult[i].card_number === req.body.card_number){
-                    hasAccessToCard = true;
-                }
-            }
-
-            if(!hasAccessToCard){
-                return res.json({status:"error",message:"User doesn't have this card"});
-            }
-
-            card.delete(req, function(err,result) {
-
-                if(err){
-                    return res.json({status:"error",message:err})
-                }
-    
-                if(result.affectedRows > 0){
-                    res.json({status:"success",message:"Card deleted"});
-                }else{
-                    res.json({status:"error",message:"Card not found"})
-                }
-            })
-        })
-        
-    }else{
-        res.json({status:"error",message:"Please fill all fields"})
+            console.log("Kortti poistettiin onnistuneesti.");
+            return res.status(200).json({ message: 'Kortti poistettiin onnistuneesti' });
+        });
     }
-    
-}
+};
+
 
 module.exports = {
     getAll,
+    getcardnumberpin,
+    addCard,
+    addCardToAccount,
     getByCardNumber,
     getByiduser,
     getCardAccountInfo,
     getCardAccountInfoByNumber,
     getTries,
     unlock,
-    addCard,
     authenticate,
     deleteCard,
-    connectCard,
-    disconnectCard
+    
 }

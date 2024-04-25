@@ -20,7 +20,7 @@ class mainUserInterface : public QWidget
     Q_OBJECT
 
 public:
-    explicit mainUserInterface(QByteArray& token, QWidget *parent = nullptr);
+    explicit mainUserInterface(QByteArray& token, QString cardNumber, QWidget *parent = nullptr);
     ~mainUserInterface();
 
 private:
@@ -34,17 +34,31 @@ private:
     QNetworkReply *preply;
     QByteArray response_data;
 
+    QNetworkAccessManager *getCreditManager;
+    QNetworkReply *creditReply;
+    QByteArray transCreditResponse_data;
+
+    QNetworkAccessManager *pgetCreditManager;
+    QNetworkReply *pCreditreply;
+    QByteArray creditResponse_data;
+
     QByteArray webToken;
+
+    QString cardNumber;
 
 private slots:
    void logoutClicked();
    void withdrawMoneyClicked();
 
-   void getCreditBalanceSlot ();
-   void onNetworkRequestFinished(QNetworkReply *preply);
+   void getDebitBalance();
+   void debitRequestFinished(QNetworkReply *preply);
+   void getCreditBalance();
+   void creditRequestFinished(QNetworkReply *pCreditreply);
 
    void handleTransactionsClicked();
    void transactionsNetworkReqFin(QNetworkReply *reply);
+   void handleCreditTransactionsClicked();
+   void transactionsCreditNetworkReqFin(QNetworkReply *creditReply);
 };
 
 #endif // MAINUSERINTERFACE_H
