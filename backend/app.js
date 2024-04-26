@@ -2,7 +2,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+// Reittien moduulit
 var indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users.js');
 const accountsRouter = require('./routes/accounts.js');
@@ -14,22 +14,24 @@ var loginRouter = require('./routes/login.js');
 
 var app = express();
 
+// Middleware-komponentit
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Reittien asettaminen
 app.use('/', indexRouter);
 app.use('/login',loginRouter);
-//app.use(authenticateToken);
+app.use(authenticateToken);
 app.use('/users', usersRouter);
 app.use('/accounts',accountsRouter);
 app.use('/addusertoaccount',accountsRouter);
 app.use('/cardroutes',cardroutesRouter);
 app.use('/accountinformation',accountinformationRouter);
 
-
+// JWT-tunnistusfunktio
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]

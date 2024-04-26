@@ -113,7 +113,7 @@ private slots:
 
     // Functions below for testing purposes
 
-    // Debit
+   /* // Debit
 
     void insertHundredClickedPut();
     void putInsertedMoneySlot(QNetworkReply *putReply);
@@ -125,8 +125,7 @@ private slots:
     void insertHundredClickedPutCredit();
     void putInsertedMoneySlotCredit(QNetworkReply *putReplyCredit);
     void insertHundredClickedPostCredit();
-    void postInsertedMoneySlotCredit(QNetworkReply *postReplyCredit);
-
+    void postInsertedMoneySlotCredit(QNetworkReply *postReplyCredit); */
 };
 
 #endif // MONEYSELECT_H

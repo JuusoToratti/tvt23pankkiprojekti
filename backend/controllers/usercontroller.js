@@ -1,13 +1,13 @@
-const user = require("../models/usermodel");
-const bcrypt = require("bcrypt");
-const emailvalidator = require("email-validator");
-//const jwt = require("../config/jwtAuth");// pois väliaikaisesti
-const fs = require("fs");
-const crypto = require('crypto');
-const multer = require('multer');
-require("dotenv").config();
+// Moduulien lataus
+const user = require("../models/usermodel"); // Käyttäjämallin moduuli
+const bcrypt = require("bcrypt"); // Salasanan hajautusta varten
+const emailvalidator = require("email-validator"); // Sähköpostin validointi
+const fs = require("fs"); // Tiedostojen käsittely
+const crypto = require('crypto'); // Salaukseen liittyvät toiminnot
+const multer = require('multer'); // Tiedostojen käsittelyyn middleware
+require("dotenv").config(); // Ympäristömuuttujien lataus
 
-
+// Kaikkien käyttäjien hakeminen
 const getAll = (req, res) => {
     user.get(function(err,dbResult){
         if(err){
@@ -19,7 +19,7 @@ const getAll = (req, res) => {
 }
 
 
-
+// Hakee käyttäjän id:n perusteella
 const getByiduser = (req, res) => {
     if(req.params.id){
         user.getById(req.params.id, function(err,dbResult){
@@ -32,7 +32,7 @@ const getByiduser = (req, res) => {
     }
 }
 
-const userLogin = (req, res) => {
+const userLogin = (req, res) => { //tämä ei tullut lopussa käyttöön idea sovelluksen kirjautumiseen
     if(emailvalidator.validate(req.body.email) && req.body.pword){
         user.getByEmail(req.body.email, function(err, dbResult){
             if(err){
@@ -64,7 +64,7 @@ const userLogin = (req, res) => {
     }
 }
 
-const userRegister = (req, res) => {
+const userRegister = (req, res) => { //käyttäjän luominen
     //console.log(req.body);
     //if(emailvalidator.validate(req.body.email) && req.body.pword && req.body.adress && req.body.fname && req.body.lname && req.body.phone && req.body.picture && req.body.username)
     if(1==1)
@@ -85,7 +85,7 @@ const userRegister = (req, res) => {
     }
 }
 
-const userInfo = (req, res) => {
+const userInfo = (req, res) => { //ei tullut käyttöön idea käyttäjän hakemiseen
     user.get(function(err, dbResult){
         if(err){
             console.log(err);
@@ -101,7 +101,7 @@ const userInfo = (req, res) => {
     });
 }
 
-const storage = multer.diskStorage({
+const storage = multer.diskStorage({ //kuva vieminen backendiin
 
     // file destination path defaults to 'uploads/' if not defined
     destination: process.env.DOWNLOAD_PATH || 'uploads/',
@@ -205,7 +205,7 @@ const updateAvatar = (req, res) => {
 
 
 
-const deleteuser = (req, res) => {
+const deleteuser = (req, res) => { // käyttäjän poistaminen
     if(req.body.iduser){
         user.deleteuser(req.iduser,function(err, dbResult){
             if (err) {
@@ -218,7 +218,7 @@ const deleteuser = (req, res) => {
     }
 };
 
-module.exports = {
+module.exports = { //vienti
     getAll,
     userLogin,
     userInfo,

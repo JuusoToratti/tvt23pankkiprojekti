@@ -1,21 +1,16 @@
+// Moduulin lataus
 var express = require('express');
-var router = express.Router();
-var db = require("../config/db");
-const usercontroller = require("../controllers/usercontroller");
-//const jwtAuth = require("../config/jwtAuth.js");//
+var router = express.Router(); // Luo Express-reituri-objektin
+var db = require("../config/db"); // Tietokantayhteyden muodostamiseen tarvittava moduuli
+const usercontroller = require("../controllers/usercontroller"); // Käyttäjäohjaimen moduuli
 
-router.get("/info",usercontroller.userInfo);
+// Reitit määritetty eri HTTP-pyyntötyypeille ja vastaavat käsittelijäfunktiot
+router.get("/info", usercontroller.userInfo); // Palauttaa käyttäjätietoja annetun ID:n perusteella
+router.get('/user', usercontroller.getAll); // Palauttaa kaikki käyttäjätietueet
+router.get('/:id', usercontroller.getByiduser); // Palauttaa käyttäjätiedot annetun ID:n perusteella
+router.post("/login", usercontroller.userLogin); // Käyttäjän kirjautuminen
+router.post("/register", usercontroller.userRegister); // Käyttäjän luominen
+router.put("/avatar", usercontroller.updateAvatar); // Päivittää käyttäjän avatarin
+router.delete("/deleteuser", usercontroller.deleteuser); // Poistaa käyttäjän
 
-router.get('/user',usercontroller.getAll)
-
-router.get('/:id',usercontroller.getByiduser);
-
-router.post("/login",usercontroller.userLogin);
-
-router.post("/register",usercontroller.userRegister);
-
-router.put("/avatar", usercontroller.updateAvatar);
-
-router.delete("/deleteuser",usercontroller.deleteuser)
-
-module.exports = router;
+module.exports = router; // Vienti, jotta tätä reittiä voidaan käyttää muualla sovelluksessa

@@ -1,7 +1,9 @@
-const accountinformation = require("../models/accountinformationmodel");
-const card = require("../models/cardmodel")
+// Tarvittavien moduulien lataus
+const accountinformation = require("../models/accountinformationmodel"); // Tilin tiedon malli
+const card = require("../models/cardmodel"); // Kortin malli
 
-const getAll = (req, res) => {
+// Kaikki tilitietojen hakemiseen liittyvät pyynnöt
+const getAll = (req, res) => { 
     accountinformation.get(function(err,dbResult){
         if(err){
             res.json(err);
@@ -10,6 +12,8 @@ const getAll = (req, res) => {
         }
     });
 }
+
+// Luottotilin tiedot hakemiseen liittyvä pyyntö
 const getcredit = (req, res) => {
     accountinformation.getcredit(function(err,dbResult){
         if(err){
@@ -19,18 +23,18 @@ const getcredit = (req, res) => {
         }
     });
 }
-const getByCardNumber = (req, res) => {
 
+// Tietyn kortin tilitietojen hakemiseen liittyvä pyyntö ei tullut käyttöön lopussa
+const getByCardNumber = (req, res) => {
+    // Tarkistetaan, onko tarvittavat parametrit annettu
     if(!req.params.card_number || !req.params.page){
         return res.json({status:"error",message:"Please fill all fields."});
     }
 
+    // Tarkistetaan, onko käyttäjällä pääsy korttiin
     card.getByiduser(req.iduser, function(err,dbResult){
-
         let hasAccessToCard = false;
-
         for(let i = 0; i < dbResult.length; i++){
-
             if(dbResult[i].card_number === req.params.card_number){
                 hasAccessToCard = true;
             }
@@ -40,11 +44,11 @@ const getByCardNumber = (req, res) => {
             return res.json({status:"error",message:"User doesn't have access to this card"});
         }
 
+        // Lasketaan sivut ja haetaan tilitiedot
         let perPageCount = 10; 
         let maxLogCount = 0;
         let currentPage = 0;
         let maxPage = 0;
-
         accountinformation.getMaxaccountinformationNum(req.params.card_number, function(err,dbResult){
             if(err){
                 return res.json(err);
@@ -79,14 +83,11 @@ const getByCardNumber = (req, res) => {
     })
 }
 
+// Tietyn kortin kiinteän määrän tilitietojen hakemiseen liittyvä pyyntö ei tullut käyttöön lopussa
 const getByCardNumberFixed = (req, res) => {
-
     card.getByiduser(req.iduser, function(err,dbResult){
-
         let hasAccessToCard = false;
-
         for(let i = 0; i < dbResult.length; i++){
-
             if(dbResult[i].card_number === req.params.card_number){
                 hasAccessToCard = true;
             }
@@ -96,6 +97,7 @@ const getByCardNumberFixed = (req, res) => {
             return res.json({status:"error",message:"User doesn't have access to this card"});
         }
 
+        // Tarkistetaan, onko kortin numero annettu
         if(req.params.card_number){
             accountinformation.getByCardNumberFixed(req.params.card_number, function(err,dbResult){
                 if(err){
@@ -115,7 +117,9 @@ const getByCardNumberFixed = (req, res) => {
     })
 }
 
+// Tietojen lisäämiseen liittyvä pyyntö
 const add = (req, res) => {
+    // Tarkistetaan, että kaikki tarvittavat kentät ovat täytetty
     if(1==1)
     {
         accountinformation.add(req.body,function(err, dbResult){
@@ -130,6 +134,8 @@ const add = (req, res) => {
         return res.json({status:"error",message:"Please fill all fields."});
     }
 }
+
+// Luottorajan lisäämiseen liittyvä pyyntö
 const addcredit = (req, res) => {
     if(1==1)
     {
@@ -145,22 +151,20 @@ const addcredit = (req, res) => {
         return res.json({status:"error",message:"Please fill all fields."});
     }
 }
-const deleteaccoutinformation = (req, res) => {
 
-        accountinformation.delete(function(err, dbResult){
-            if (err) {
-                console.error("Virhe poistettaessa tilitietoja:", err);
-                return res.status(500).json({ error: 'Virhe poistettaessa tilitietoja' });
-            }
-            console.log("Tilitieto poistettiin onnistuneesti.");
-            return res.status(200).json({ message: 'Tilitieto poistettiin onnistuneesti' });
-        });
-    
+// Tilitietojen poistamiseen liittyvä pyyntö
+const deleteaccoutinformation = (req, res) => {
+    accountinformation.delete(function(err, dbResult){
+        if (err) {
+            console.error("Virhe poistettaessa tilitietoja:", err);
+            return res.status(500).json({ error: 'Virhe poistettaessa tilitietoja' });
+        }
+        console.log("Tilitieto poistettiin onnistuneesti.");
+        return res.status(200).json({ message: 'Tilitieto poistettiin onnistuneesti' });
+    });
 };
 
-   
-
-
+// Viedään kaikki funktiot moduulina käytettäväksi muissa tiedostoissa
 module.exports = {
     getAll,
     getcredit,

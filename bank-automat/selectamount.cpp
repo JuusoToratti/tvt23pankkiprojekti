@@ -62,7 +62,6 @@ void selectAmount::backToMoneySelect()
 
 void selectAmount::putAmount()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -121,7 +120,6 @@ void selectAmount::putSelectAnyAmount(QNetworkReply *putReply)
 
 void selectAmount::getAmount()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-0600062093") {
         return;
     }
@@ -212,7 +210,6 @@ void selectAmount::postAnyAmount(QNetworkReply *postReply)
 
 void selectAmount::putAmountCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         return;
     }
@@ -271,7 +268,6 @@ void selectAmount::putSelectAnyAmountCredit(QNetworkReply *putReplyCredit)
 
 void selectAmount::getAmountCredit()
 {
-    // Tarkistetaan kortin numero
     if (cardNumber != "-06000621FE") {
         return;
     }

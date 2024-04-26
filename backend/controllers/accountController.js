@@ -1,3 +1,4 @@
+// Tarvittavien moduulien lataus
 const emailvalidator = require("email-validator");
 const sanitizer = require("sanitizer");
 const { json } = require("express/lib/response");
@@ -6,6 +7,7 @@ const user = require("../models/usermodel");
 const card = require("../models/cardmodel");
 const res = require("express/lib/response");
 
+// Kaikkien tilitietojen hakeminen
 const getAll = (req, res) => {
     account.get(function(err, dbResult){
         if(err){
@@ -15,7 +17,7 @@ const getAll = (req, res) => {
         }
     });
 }
-
+// Tilin saldon hakeminen tietyn tilinumeron perusteella
 const getaccountbalance = (req, res) => {
     if(req.params.id)
     
@@ -27,6 +29,7 @@ const getaccountbalance = (req, res) => {
         }
     });
 }
+// Luottorajan hakeminen tietyn tilinumeron perusteella
 const getcreditlimit = (req, res) => {
     if(req.params.id)
     
@@ -38,6 +41,7 @@ const getcreditlimit = (req, res) => {
         }
     });
 }
+// Tilin saldon päivittäminen
 const updateBalance = (req, res) => {
     if(req.body.account_balance){
 
@@ -53,7 +57,7 @@ const updateBalance = (req, res) => {
         return res.json({status:"error", message:"account_balance missing from request"});
     }
 }
-const updatecredit = (req, res) => {
+const updatecredit = (req, res) => { // Luottorajan päivittäminen
     if(req.body.credit_limit){
         account.updatecredit(req.body.credit_limit, (err, dbResult) => {
             if(err){
@@ -68,7 +72,7 @@ const updatecredit = (req, res) => {
     }
 }
 
-getOwnedAccounts = (req, res) => {
+getOwnedAccounts = (req, res) => { // hakee tilit käytttäjän perusteella ei tullut käyttöön
     account.getByiduser(req,function(err, dbResult){
         if(err){
             return res.json(err);
@@ -78,7 +82,7 @@ getOwnedAccounts = (req, res) => {
     });
 }
 
-const addAccount = (req, res) => {
+const addAccount = (req, res) => { //lisää käyttäjä
     // if(req.iduser && req.body.name)
     if(1==1)
     {
@@ -95,7 +99,7 @@ const addAccount = (req, res) => {
     }
 }
 
-const addUserToAccount = (req, res) => {
+const addUserToAccount = (req, res) => { //käyttäjän ja tilin yhdistäminen
     if((req.body.iduser) && req.body.idaccount)
    // if (1==1)
       {  
@@ -111,7 +115,7 @@ if(err){
     return res.json({status:"error",message:"Please fill all fields."});
     }
 }
-const getConnectedUsers = (req, res) => {
+const getConnectedUsers = (req, res) => {// hakee tilit joilla on käyttäjä ei tullut käyttöön
     if(req.params.id){
         account.getOwnerById(req.iduser, req.params.id, function(err, dbResult){
             if(err){
@@ -145,7 +149,7 @@ const getConnectedUsers = (req, res) => {
 }
 
 
-const disconnectUser = (req, res) => {
+const disconnectUser = (req, res) => { // poistaa käyttäjän tilistä ei tullut käyttöön
     if(req.body.account && req.body.user){
         account.getOwnerById(req.iduser, req.body.account, function(err, dbResult){
             if(err){
@@ -153,7 +157,7 @@ const disconnectUser = (req, res) => {
             }
             let hasAccessToAccount = false;
             for(let i=0;i<dbResult.length;i++){
-                if(dbResult[i].account_ID.toString() === req.body.account.toString() && dbResult[i].owner.toString() === req.iduser){
+                if(dbResult[i].idaccount.toString() === req.body.account.toString() && dbResult[i].owner.toString() === req.iduser){
                     hasAccessToAccount = true;
                 }
             }
@@ -176,7 +180,7 @@ const disconnectUser = (req, res) => {
     }
 }
 
-const deleteAccount = (req, res) => {
+const deleteAccount = (req, res) => { // tilin poisto
     if(req.body.idaccount){
         account.delete(req.idaccount,function(err, dbResult){
             if (err) {
@@ -188,6 +192,7 @@ const deleteAccount = (req, res) => {
         });
     }
 };
+//vienti
 module.exports = {
     getAll,
     getaccountbalance,
