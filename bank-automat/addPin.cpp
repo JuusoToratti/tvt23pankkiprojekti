@@ -8,6 +8,8 @@
 #include <QProcess>
 #include <QCloseEvent>
 #include <QtSql>
+#include <QPixmap>
+#include <QLabel>
 
 addPin::addPin(QString cardNumber, QWidget *parent)
     : QWidget(parent)
@@ -184,6 +186,7 @@ void addPin::getNamesSlot(QNetworkReply *preply)
     if (customerName) {
         customerName->setText(cName);
     }
+
     mainUserInterfaceWindow->show();
 
     // Close the current window
