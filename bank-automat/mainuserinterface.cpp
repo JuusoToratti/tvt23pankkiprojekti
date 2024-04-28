@@ -9,10 +9,11 @@
 #include "ui_accwithdrawals.h"
 #include <QProcess>
 #include <QStandardItem>
-
+#include <QPixmap>
 #include <QtNetwork>
 #include <QNetworkAccessManager>
 #include <QJsonDocument>
+#include <QLabel>
 
 mainUserInterface::mainUserInterface(QByteArray& token, QString cardNumber, QWidget *parent)
     : QWidget(parent)
@@ -22,7 +23,33 @@ mainUserInterface::mainUserInterface(QByteArray& token, QString cardNumber, QWid
 {
     ui->setupUi(this);
 
-    this->setAttribute(Qt::WA_DeleteOnClose); // Aseta WA_DeleteOnClose -ominaisuus
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
+    // Fetch the picture and show it
+    QNetworkAccessManager *picManager = new QNetworkAccessManager(this);
+    QNetworkReply *picReply = picManager->get(QNetworkRequest(QUrl("http://localhost:3000/images/mike.jpg")));
+
+    QObject::connect(picReply, &QNetworkReply::finished, [=]() {
+        if (picReply->error() == QNetworkReply::NoError) {
+            QByteArray imageData = picReply->readAll();
+            QPixmap originalPixmap;
+            originalPixmap.loadFromData(imageData);
+
+            if (!originalPixmap.isNull() && cardNumber == "-06000621FE") {
+
+                // Scale the picture to a proper size
+                QSize labelSize = ui->imageLabel->size();
+                QPixmap scaledPixmap = originalPixmap.scaled(labelSize, Qt::KeepAspectRatio);
+
+                ui->imageLabel->setPixmap(scaledPixmap);
+            } else {
+                qDebug() << "Kuvan lataaminen epäonnistui";
+            }
+        } else {
+            qDebug() << "Virhe kuvaa ladattaessa:" << picReply->errorString();
+        }
+        picReply->deleteLater();
+    });
 
     QPalette palette;
     palette.setBrush(this->backgroundRole(), QBrush(QImage("C:/bank.background.jpg")));
