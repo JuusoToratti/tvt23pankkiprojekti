@@ -203,8 +203,6 @@ const updateAvatar = (req, res) => {
     })
 }
 
-
-
 const deleteuser = (req, res) => { // käyttäjän poistaminen
     if(req.body.iduser){
         user.deleteuser(req.iduser,function(err, dbResult){

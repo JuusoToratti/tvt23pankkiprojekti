@@ -30,6 +30,8 @@ app.use('/accounts',accountsRouter);
 app.use('/addusertoaccount',accountsRouter);
 app.use('/cardroutes',cardroutesRouter);
 app.use('/accountinformation',accountinformationRouter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // JWT-tunnistusfunktio
 function authenticateToken(req, res, next) {
@@ -48,6 +50,21 @@ function authenticateToken(req, res, next) {
       next()
     })
   }
+  app.get('/uploads/:filename', (req, res) => {
 
+    const  filename  = req.params;
+    const filePath = path.join(__dirname, 'uploads', filename);
+
+    
+        // Palautetaan tiedosto käyttämällä Expressin sendFile-metodia
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                // Käsitellään virhe, jos tiedostoa ei löydy tai muuta ongelmaa
+                console.error('Virhe tiedoston palauttamisessa:', err);
+                res.status(err.status || 500).end();
+            }
+        });
+    });
+    
 
 module.exports = app;
